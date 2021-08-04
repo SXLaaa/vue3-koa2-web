@@ -1,6 +1,6 @@
 <template>
-  <div>
-    welcome
+  <div class="welcome">
+    欢迎来到主页面 welcome
   </div>
 </template>
 <script>
@@ -11,3 +11,5 @@ export default {
   },
 }
 </script>
+<style scoped>
+</style>
