@@ -5,15 +5,15 @@ const env = import.meta.env.MODE || 'prod';
 const EnvConfig = {
     dev:{
         baseApi:'/',
-        mockApi:'https://www.fastmock.site/mock/c1c302e8baed9894c48c17e4738c092e/api'
+        mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     },
     test:{
         baseApi:'//test.futurefe.com/api',
-        mockApi:'https://www.fastmock.site/mock/c1c302e8baed9894c48c17e4738c092e/api'
+        mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     },
     prod:{
         baseApi:'//futurefe.com/api',
-        mockApi:'https://www.fastmock.site/mock/c1c302e8baed9894c48c17e4738c092e/api'
+        mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     }
 }
 export default {
