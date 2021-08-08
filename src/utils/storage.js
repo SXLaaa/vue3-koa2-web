@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+/**
+ * Storage二次封装
+ * @author JackBean
+ */
+>>>>>>> origin/8-8登陆布局开发
 import config from './../config'
 export default {
     setItem(key,val){
