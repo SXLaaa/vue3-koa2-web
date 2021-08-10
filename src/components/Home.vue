@@ -8,28 +8,13 @@
       </div>
       <!-- 导航菜单 el-submenu 父级 el-menu-item 子级-->
       <el-menu
-        default-active="2"
         background-color="#001529"
         text-color="#fff"
         router
         :collapse="isCollapse"
+        :default-active="activeMenu"
         class="nav-menu">
-          <el-submenu index="1">
-            <template #title>
-              <i class="el-icon-setting"></i>
-              <span>系统管理</span>
-            </template>
-            <el-menu-item index="1-1">用户管理</el-menu-item>
-            <el-menu-item index="1-2">菜单管理</el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template #title>
-              <i class="el-icon-setting"></i>
-              <span>审批管理</span>
-            </template>
-            <el-menu-item index="2-1">休假申请</el-menu-item>
-            <el-menu-item index="2-2">待我审批</el-menu-item>
-          </el-submenu>
+          <TreeMenu :MenuList="menuList"/>
       </el-menu>
     </div>
     <div :class="['Layout-right', isCollapse?'fold':'unfold']">
@@ -41,18 +26,18 @@
         </div>
         <!-- 提示消息+角色选择 -->
         <div class="user-info">
-          <el-badge :is-dot="true" class="notice">
+          <el-badge :is-dot="noticeCount>0?true:false" class="notice">
             <i class="el-icon-bell"></i>
           </el-badge>
-          <el-dropdown @command="handleLogout">
+          <el-dropdown @command="handleLogout" class="user-info-select">
             <span class="user-link">
               {{userInfo.userName}}
               <i class="el-icon--right"></i>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="email">邮箱:{{userInfo.userEmail}}</el-dropdown-item>
-                <el-dropdown-item command="logout">退出:</el-dropdown-item>
+                <el-dropdown-item command="email"><span class="messageSpan">邮箱:{{userInfo.userEmail}}</span></el-dropdown-item>
+                <el-dropdown-item command="logout"><span class="messageSpan">退出</span></el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -68,16 +53,22 @@
 </template>
 
 <script>
+import TreeMenu from './TreeMenu.vue'
 export default{
   name:'Home',
+  components:{TreeMenu},
   data(){
     return{
       isCollapse: false,
-      userInfo:{
-        userName:'shiXiaoLei',
-        userEmail:'shixiaolei@qq.com',
-      }
+      userInfo:this.$store.state.userInfo,
+      noticeCount: 0,
+      menuList:[],
+      activeMenu: location.hash.slice(1) // 获取浏览器地址#后面的
     }
+  },
+  mounted(){
+    this.getNoticeCount()
+    this.getMenuList()
   },
   methods:{
     toggle(){
@@ -88,12 +79,33 @@ export default{
       this.$store.commit('saveUserInfo', '');
       this.userInfo = null;
       this.$router.push('/login')
+    },
+    async getNoticeCount(){
+      try{
+        const count = await this.$api.noticeCount();
+        this.noticeCount = count
+      }catch(error){
+        console.error(error)
+      }
+    },
+    async getMenuList(){
+      try{
+        const menuList = await this.$api.getMenuList();
+        this.menuList = menuList.menuList
+      }catch(error){
+        console.error(error)
+      }
     }
   }
 }
 </script>
 
 <style lang="scss">
+.messageSpan{
+  white-space: nowrap;  /*强制span不换行*/
+  overflow: hidden;  /*超出宽度部分隐藏*/
+  text-overflow: ellipsis;  /*超出部分以点号代替*/
+}
 .Layout{
   position:relative;
   &-side{
@@ -159,6 +171,17 @@ export default{
           cursor: pointer;
           color: #409eff;
         }
+        // &-select{
+        //   /deep/.messageSpan{
+        //     background: saddlebrown;
+        //     white-space: nowrap;  /*强制span不换行*/
+        //     display: inline-block;  /*将span当做块级元素对待*/
+        //     width: 32px;  /*限制宽度*/
+        //     overflow: hidden;  /*超出宽度部分隐藏*/
+        //     text-overflow: ellipsis;  /*超出部分以点号代替*/
+        //     line-height: 0.9;  /*数字与之前的文字对齐*/
+        //   }
+        // }
       }
     }
     &-wrapper{

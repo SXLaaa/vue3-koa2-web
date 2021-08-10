@@ -9,5 +9,19 @@ export default {
             method:'post',
             data:params,
         })
-    }
+    },
+    noticeCount(params){ // 待审批通知数量
+        return request({
+            url:'/leave/count',
+            method:'get',
+            data:{},
+        })
+    },
+    getMenuList(params){ // 获取菜单列表
+        return request({
+            url:'/menu/list',
+            method:'get',
+            data:{},
+        })
+    },
 }
