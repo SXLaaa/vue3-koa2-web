@@ -22,7 +22,9 @@
         <!-- 展开隐藏+面包屑 -->
         <div class="Layout-right-top-bread">
           <div class="menu-fold" @click="toggle"><i class="el-icon-s-fold"></i></div>
-          <div class="bread">面包屑</div>
+          <div class="bread">
+            <BreadCrumb/>
+          </div>
         </div>
         <!-- 提示消息+角色选择 -->
         <div class="user-info">
@@ -54,9 +56,10 @@
 
 <script>
 import TreeMenu from './TreeMenu.vue'
+import BreadCrumb from './BreadCrumb.vue'
 export default{
   name:'Home',
-  components:{TreeMenu},
+  components:{TreeMenu, BreadCrumb},
   data(){
     return{
       isCollapse: false,
