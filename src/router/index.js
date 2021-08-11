@@ -24,17 +24,7 @@ const routes = [
                 meta:{
                     title:"用户管理"
                 },
-                component:()=>import('@/views/Welcome.vue'),
-                children:[
-                    {
-                        name:'info',
-                        path:'info',
-                        meta:{
-                            title:'用户信息'
-                        },
-                        component:()=>import('@/views/Welcome.vue'),
-                    },
-                ]
+                component:()=>import('@/views/User.vue')
             }
         ]
     },

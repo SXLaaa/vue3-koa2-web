@@ -15,6 +15,7 @@ export default {
             url:'/leave/count',
             method:'get',
             data:{},
+            mock: true
         })
     },
     getMenuList(params){ // 获取菜单列表
@@ -22,6 +23,7 @@ export default {
             url:'/menu/list',
             method:'get',
             data:{},
+            mock: true
         })
     },
 }
