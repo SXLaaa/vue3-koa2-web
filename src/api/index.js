@@ -34,4 +34,12 @@ export default {
             mock: true
         })
     }, 
+    userDel(params){ // 删除单个用户/多个用户
+        return request({
+            url:'/users/delete',
+            method:'post',
+            data:params,
+            mock: true
+        })
+    }, 
 }
