@@ -1,7 +1,7 @@
 <template>
   <div class="user-manag">
     <div class="query-form">
-      <el-form :inline="true" :model="user">
+      <el-form ref="form" :inline="true" :model="user">
         <el-form-item label="用户ID" prop="userId">
             <el-input v-model="user.userId" placeholder="请输入用户ID"/>
         </el-form-item>
@@ -55,15 +55,24 @@
   </div>
 </template>
 <script>
-import { onMounted, reactive, ref } from 'vue'
+import {getCurrentInstance, onMounted, reactive, ref } from 'vue'
 export default {
   name:'user',
   setup(){
     /**
      * ref 定义基本数据类型（.value访问） reactive定义复杂类型（直接访问）
      * */ 
-    const user = reactive({});
+    const { proxy } = getCurrentInstance();// ctx 是上下文对象，可以拿到很多字段。 getCurrentInstance 方法获取当前组件实例
+    // 初始化数据
+    const user = reactive({
+      state:0
+    });
     const userList = ref([]);
+    const pager = reactive({
+      pageNum: 1,
+      pageSize: 10
+    })
+    // 表格格式
     const columns = reactive([
       {
         label:'用户ID',
@@ -94,12 +103,36 @@ export default {
         prop:'lastLoginTime'
       }
     ])
+    // 初始化接口调用
     onMounted(()=> {
-      console.log('')
+      getUserList()
     })
+    const getUserList = async ()=> {
+      let params = {...user, ...pager};
+      try{
+        const { list,page } = await proxy.$api.getUserList(params)
+        userList.value = list;
+        pager.total = page.total;
+      }catch(error){
 
+      }
+    }
+    // 查询
+    const handleQuery = ()=> {
+      getUserList();
+    }
+    // 重置
+    const handleReset = ()=> {
+      proxy.$refs.form.resetFields(); // proxy相当于this
+    }
+    // 分页
+    const handleCurrentChange = (current)=>{
+      pager.pageNum = current;
+      getUserList();
+    }
     return {
-      user, userList, columns
+      user, userList, columns, pager,
+      getUserList, handleQuery, handleReset, handleCurrentChange
     }
   }
 }
