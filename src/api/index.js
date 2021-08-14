@@ -42,4 +42,28 @@ export default {
             mock: true
         })
     }, 
+    getRoleList(){ // 角色列表
+        return request({
+            url:'/roles/list',
+            method:'get',
+            data:{},
+            mock: true
+        })
+    }, 
+    getDeptList(){ //部门列表
+        return request({
+            url:'/dept/list',
+            method:'get',
+            data:{},
+            mock: true
+        })
+    },
+    userSubmit(params){
+        return request({
+            url:'/users/operate',
+            method:'post',
+            data:params,
+            mock: true
+        })
+    } 
 }

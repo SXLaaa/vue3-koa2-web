@@ -18,7 +18,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
+          <el-button @click="handleReset(form)">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -130,14 +130,16 @@
   </div>
 </template>
 <script>
-import { getCurrentInstance, onMounted, reactive, ref } from "vue";
+import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
 export default {
   name: "user",
   setup() {
     /**
      * ref 定义基本数据类型（.value访问） reactive定义复杂类型（直接访问）
+     * toRaw 返回响应式对象的普通对象，可以通过这个对象达到修改数据，而不更新页面的效果
+     * proxy 是上下文对象，可以拿到很多字段（替代this）。 getCurrentInstance 方法获取当前组件实例
      * */
-    const { proxy } = getCurrentInstance(); // ctx 是上下文对象，可以拿到很多字段。 getCurrentInstance 方法获取当前组件实例
+    const { proxy } = getCurrentInstance();
     // 初始化数据
     const user = reactive({
       state: 0,
@@ -198,6 +200,12 @@ export default {
    const userForm = reactive({
      state: 3, // 默认状态
    })
+   // 角色列表
+   const roleList = ref([])
+   // 部门列表
+   const deptList = ref([])
+   // 定义是新增/编辑
+   const action = ref('add')
    const rules = reactive({
      userName: [
         {
@@ -227,6 +235,8 @@ export default {
     // 初始化接口调用
     onMounted(() => {
       getUserList();
+      getRoleList();
+      getDepList();
     });
     const getUserList = async () => {
       let params = { ...user, ...pager };
@@ -241,8 +251,8 @@ export default {
       getUserList();
     };
     // 重置
-    const handleReset = () => {
-      proxy.$refs.form.resetFields(); // proxy相当于this
+    const handleReset = (form) => {
+      proxy.$refs[form].resetFields(); // proxy相当于this
     };
     // 分页
     const handleCurrentChange = (current) => {
@@ -285,12 +295,38 @@ export default {
     const handleCreate = ()=> {
       showModal.value = true
     }
+
     // 用户新增=取消/确定
     const handleClose = ()=> {
-
+      showModal.value = false;
+      handleReset("dialogForm");
     }
     const handleSubmit = ()=> {
-
+      proxy.$refs.dialogForm.validate(async(valid)=> {
+        if(valid){
+          let params = toRaw(userForm);
+          params.userEmail += "@imooc.com";
+          params.action = action.value;
+          let res = await proxy.$api.userSubmit(params);
+          if(res){
+            showModal.value = false;
+            proxy.$message.success('用户创建成功');
+            handleReset("dialogForm");
+            getUserList();
+          }
+        }
+      })
+    }
+    /**
+     * 接口=获取角色、获取部门
+    */
+    const getDepList = async ()=> {
+      let list = await proxy.$api.getDeptList()
+      deptList.value = list
+    }
+    const getRoleList = async ()=> {
+      let list = await proxy.$api.getRoleList()
+      roleList.value = list.list
     }
     return {
       user,
@@ -301,6 +337,8 @@ export default {
       showModal,
       userForm,
       rules,
+      roleList,
+      deptList,
       getUserList,
       handleQuery,
       handleReset,
@@ -310,7 +348,9 @@ export default {
       handleSelectionChange, 
       handleCreate,
       handleClose,
-      handleSubmit
+      handleSubmit,
+      getRoleList,
+      getDepList
     };
   },
 };
