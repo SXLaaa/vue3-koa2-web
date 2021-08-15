@@ -65,11 +65,12 @@ export default {
     });
   },
   userSubmit(params) {
+    // 编辑/创建
     return request({
       url: "/users/operate",
       method: "post",
       data: params,
-      mock: true,
+      mock: false,
     });
   },
 };
