@@ -272,7 +272,7 @@ export default {
     };
     // 单个删除
     const handleDel = async (row) => {
-      await proxy.$api.userDell({
+      await proxy.$api.userDel({
         userIds: [row.userId],
       });
       proxy.$message.success("删除成功");
