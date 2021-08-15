@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="handleClick(scope.row)" size="mini"
+            <el-button @click="handleEdit(scope.row)" size="mini"
               >编辑</el-button
             >
             <el-button type="danger" size="mini" @click="handleDel(scope.row)"
@@ -67,6 +67,7 @@
       >
         <el-form-item label="用户名" prop="userName">
           <el-input
+            :disable="action == 'edit'"
             v-model="userForm.userName"
             :disabled="action == 'edit'"
             placeholder="请输入用户名称"
@@ -74,6 +75,7 @@
         </el-form-item>
         <el-form-item label="邮箱" prop="userEmail">
           <el-input
+            :disable="action == 'edit'"
             v-model="userForm.userEmail"
             :disabled="action == 'edit'"
             placeholder="请输入用户邮箱"
@@ -168,23 +170,23 @@ export default {
       {
         label: "用户角色",
         prop: "role",
-        formatter(row,column,value){
+        formatter(row, column, value) {
           return {
-            0:'管理员',
-            1:'普通用户'
-          }[value]
-        }
+            0: "管理员",
+            1: "普通用户",
+          }[value];
+        },
       },
       {
         label: "用户状态",
         prop: "state",
-        formatter(row,column,value){
+        formatter(row, column, value) {
           return {
-            1:'在职',
-            2:'离职',
-            3:'试用期',
-          }[value]
-        }
+            1: "在职",
+            2: "离职",
+            3: "试用期",
+          }[value];
+        },
       },
       {
         label: "注册时间",
@@ -195,19 +197,19 @@ export default {
         prop: "lastLoginTime",
       },
     ]);
-   // 弹框显示
-   const showModal = ref(false)
-   const userForm = reactive({
-     state: 3, // 默认状态
-   })
-   // 角色列表
-   const roleList = ref([])
-   // 部门列表
-   const deptList = ref([])
-   // 定义是新增/编辑
-   const action = ref('add')
-   const rules = reactive({
-     userName: [
+    // 弹框显示
+    const showModal = ref(false);
+    const userForm = reactive({
+      state: 3, // 默认状态
+    });
+    // 角色列表
+    const roleList = ref([]);
+    // 部门列表
+    const deptList = ref([]);
+    // 定义是新增/编辑
+    const action = ref("add");
+    const rules = reactive({
+      userName: [
         {
           required: true,
           message: "请输入用户名称",
@@ -231,7 +233,7 @@ export default {
           trigger: "blur",
         },
       ],
-   })
+    });
     // 初始化接口调用
     onMounted(() => {
       getUserList();
@@ -260,79 +262,89 @@ export default {
       getUserList();
     };
     // 单个删除
-    const handleDel = async (row)=> {
+    const handleDel = async (row) => {
       await proxy.$api.userDell({
-        userIds:[row.userId]
-      })
-      proxy.$message.success("删除成功")
+        userIds: [row.userId],
+      });
+      proxy.$message.success("删除成功");
       getUserList();
-    }
+    };
     // 批量删除
-    const handlePatchDel = async ()=> {
-      if(checkeUserIds.value.length == 0){
-        proxy.$message.error('请选择要删除的用户')
-        return
+    const handlePatchDel = async () => {
+      if (checkeUserIds.value.length == 0) {
+        proxy.$message.error("请选择要删除的用户");
+        return;
       }
       const res = await proxy.$api.userDel({
-        userIds:checkeUserIds.value
-      })
+        userIds: checkeUserIds.value,
+      });
       if (res.nModified > 0) {
         proxy.$message.success("删除成功");
         getUserList();
       } else {
         proxy.$message.success("修改失败");
       }
-    }
+    };
     // 表格多选
-    const handleSelectionChange = (list)=> {
+    const handleSelectionChange = (list) => {
       let arr = [];
-      list.map(item => {
+      list.map((item) => {
         arr.push(item.userId);
-      })
+      });
       checkeUserIds.value = arr;
-    }
+    };
     // 用户新增
-    const handleCreate = ()=> {
-      showModal.value = true
-    }
-
+    const handleCreate = () => {
+      showModal.value = true;
+      action.value = "add";
+    };
+    // 用户编辑
+    const handleEdit = (row) => {
+      action.value = "edit";
+      showModal.value = true;
+      proxy.$nextTick(() => {
+        // 点击编辑，给form赋值
+        Object.assign(userForm, row);
+      });
+    };
     // 用户新增=取消/确定
-    const handleClose = ()=> {
+    const handleClose = () => {
       showModal.value = false;
       handleReset("dialogForm");
-    }
-    const handleSubmit = ()=> {
-      proxy.$refs.dialogForm.validate(async(valid)=> {
-        if(valid){
+    };
+    const handleSubmit = () => {
+      proxy.$refs.dialogForm.validate(async (valid) => {
+        if (valid) {
           let params = toRaw(userForm);
           params.userEmail += "@imooc.com";
           params.action = action.value;
           let res = await proxy.$api.userSubmit(params);
-          if(res){
+          if (res) {
             showModal.value = false;
-            proxy.$message.success('用户创建成功');
+            proxy.$message.success("用户创建成功");
             handleReset("dialogForm");
             getUserList();
           }
         }
-      })
-    }
+      });
+    };
     /**
      * 接口=获取角色、获取部门
-    */
-    const getDepList = async ()=> {
-      let list = await proxy.$api.getDeptList()
-      deptList.value = list
-    }
-    const getRoleList = async ()=> {
-      let list = await proxy.$api.getRoleList()
-      roleList.value = list.list
-    }
+     */
+    const getDepList = async () => {
+      let list = await proxy.$api.getDeptList();
+      deptList.value = list;
+    };
+    const getRoleList = async () => {
+      let list = await proxy.$api.getRoleList();
+      roleList.value = list.list;
+    };
     return {
       user,
       userList,
       columns,
       pager,
+      action,
       checkeUserIds,
       showModal,
       userForm,
@@ -345,12 +357,13 @@ export default {
       handleCurrentChange,
       handleDel,
       handlePatchDel,
-      handleSelectionChange, 
+      handleSelectionChange,
       handleCreate,
+      handleEdit,
       handleClose,
       handleSubmit,
       getRoleList,
-      getDepList
+      getDepList,
     };
   },
 };
