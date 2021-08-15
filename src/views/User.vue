@@ -133,6 +133,7 @@
 </template>
 <script>
 import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
+import utils from "../utils/utils";
 export default {
   name: "user",
   setup() {
@@ -191,10 +192,18 @@ export default {
       {
         label: "注册时间",
         prop: "createTime",
+        width: 180,
+        formatter: (row, column, value) => {
+          return utils.formateDate(new Date(value));
+        },
       },
       {
         label: "最后登录时间",
         prop: "lastLoginTime",
+        width: 180,
+        formatter: (row, column, value) => {
+          return utils.formateDate(new Date(value));
+        },
       },
     ]);
     // 弹框显示
