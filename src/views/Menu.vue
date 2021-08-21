@@ -190,6 +190,7 @@ export default {
       ],
       showModal: false,
       menuForm: {
+        parentId: [null],
         menuType: 1,
         menuState: 1,
       },
@@ -219,7 +220,7 @@ export default {
     async getMenuList() {
       try {
         let list = await this.$api.getMenuList(this.queryForm);
-        this.menuList = list.menuList;
+        this.menuList = list;
       } catch (error) {
         throw new Error(error);
       }
