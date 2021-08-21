@@ -65,12 +65,21 @@ export default {
     });
   },
   userSubmit(params) {
-    // 编辑/创建
+    // 编辑/创建 - 用户列表
     return request({
       url: "/users/operate",
       method: "post",
       data: params,
       mock: false,
+    });
+  },
+  menuSubmit(params) {
+    // 编辑/创建 - 菜单列表
+    return request({
+      url: "/menu/operate",
+      method: "post",
+      data: params,
+      mock: true,
     });
   },
 };

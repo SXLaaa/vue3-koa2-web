@@ -12,14 +12,14 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleQuery">查询</el-button>
+          <el-button type="primary" @click="getMenuList">查询</el-button>
           <el-button @click="handleReset(form)">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="base-table">
       <div class="action">
-        <el-button type="primary" @click="handleAdd">新增</el-button>
+        <el-button type="primary" @click="handleAdd(1)">新增</el-button>
       </div>
       <el-table
         :data="menuList"
@@ -36,9 +36,9 @@
           :formatter="item.formatter"
         >
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="220">
           <template #default="scope">
-            <el-button @click="handleAdd(scope.row)" size="mini"
+            <el-button @click="handleAdd(2, scope.row)" size="mini"
               >新增</el-button
             >
             <el-button @click="handleEdit(scope.row)" size="mini"
@@ -51,68 +51,68 @@
         </el-table-column>
       </el-table>
     </div>
-    <!-- <el-dialog title="用户新增" v-model="showModal">
+    <el-dialog title="用户新增" v-model="showModal">
       <el-form
         ref="dialogForm"
-        :model="userForm"
+        :model="menuForm"
         label-width="100px"
         :rules="rules"
       >
-        <el-form-item label="用户名" prop="userName">
-          <el-input
-            :disable="action == 'edit'"
-            v-model="userForm.userName"
-            :disabled="action == 'edit'"
-            placeholder="请输入用户名称"
-          />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="userEmail">
-          <el-input
-            :disable="action == 'edit'"
-            v-model="userForm.userEmail"
-            :disabled="action == 'edit'"
-            placeholder="请输入用户邮箱"
-          >
-            <template #append>@imooc.com</template>
-          </el-input>
-        </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="userForm.mobile" placeholder="请输入手机号" />
-        </el-form-item>
-        <el-form-item label="岗位" prop="job">
-          <el-input v-model="userForm.job" placeholder="请输入岗位" />
-        </el-form-item>
-        <el-form-item label="状态" prop="state">
-          <el-select v-model="userForm.state">
-            <el-option :value="1" label="在职"></el-option>
-            <el-option :value="2" label="离职"></el-option>
-            <el-option :value="3" label="试用期"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="系统角色" prop="roleList">
-          <el-select
-            v-model="userForm.roleList"
-            placeholder="请选择用户系统角色"
-            multiple
-            style="width: 100%"
-          >
-            <el-option
-              v-for="role in roleList"
-              :key="role._id"
-              :label="role.roleName"
-              :value="role._id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="部门" prop="deptId">
+        <el-form-item label="父级菜单" prop="parentId">
           <el-cascader
-            v-model="userForm.deptId"
-            placeholder="请选择所属部门"
-            :options="deptList"
-            :props="{ checkStrictly: true, value: '_id', label: 'deptName' }"
+            v-model="menuForm.parentId"
+            :options="menuList"
+            :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
             clearable
-            style="width: 100%"
-          ></el-cascader>
+          />
+          <span>不选，则直接创建一级菜单</span>
+        </el-form-item>
+        <el-form-item label="菜单类型" prop="menuType">
+          <el-radio-group v-model="menuForm.menuType">
+            <el-radio :label="1">菜单</el-radio>
+            <el-radio :label="2">按钮</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="菜单名称" prop="menuName">
+          <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" />
+        </el-form-item>
+        <el-form-item
+          label="菜单图标"
+          prop="icon"
+          v-show="menuForm.menuType == 1"
+        >
+          <el-input v-model="menuForm.icon" placeholder="请输入岗位" />
+        </el-form-item>
+        <el-form-item
+          label="路由地址"
+          prop="path"
+          v-show="menuForm.menuType == 1"
+        >
+          <el-input v-model="menuForm.path" placeholder="请输入路由地址" />
+        </el-form-item>
+        <el-form-item
+          label="权限标识"
+          prop="menuCode"
+          v-show="menuForm.menuType == 2"
+        >
+          <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识" />
+        </el-form-item>
+        <el-form-item
+          label="组件路径"
+          prop="component"
+          v-show="menuForm.menuType == 1"
+        >
+          <el-input v-model="menuForm.component" placeholder="请输入组件路径" />
+        </el-form-item>
+        <el-form-item
+          label="菜单状态"
+          prop="menuState"
+          v-show="menuForm.menuType == 1"
+        >
+          <el-radio-group v-model="menuForm.menuState">
+            <el-radio :label="1">正常</el-radio>
+            <el-radio :label="2">停用</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -121,7 +121,7 @@
           <el-button type="primary" @click="handleSubmit">确 定</el-button>
         </span>
       </template>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -185,12 +185,34 @@ export default {
           },
         },
       ],
+      showModal: false,
+      menuForm: {
+        menuType: 1,
+        menuState: 1,
+      },
+      action: "", // 区分编辑和新建
+      rules: {
+        menuName: [
+          {
+            required: true,
+            message: "请输入菜单名称",
+            trigger: ["blur"],
+          },
+          {
+            min: 2,
+            max: 10,
+            message: "长度在2-8个字符",
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   mounted() {
     this.getMenuList();
   },
   methods: {
+    // 列表初始化查询
     async getMenuList() {
       try {
         let list = await this.$api.getMenuList(this.queryForm);
@@ -199,11 +221,41 @@ export default {
         throw new Error(error);
       }
     },
-    handleQuery() {},
-    handleReset() {},
-    handleAdd() {},
+    // 表单重置
+    handleReset(form) {
+      this.$refs[form].resetFields();
+    },
+    //新增菜单
+    handleAdd(type, row) {
+      this.showModal = true;
+      this.action = "add";
+      if (type == 2) {
+        // 行内新增
+        this.menuForm.parentId = [...row.parentId, row._id].filter(
+          (item) => item
+        ); // 判读只有item不为null的时候再拼接
+      }
+    },
     handleEdit() {},
     handleDel() {},
+    // 新增菜单提交
+    handleSubmit() {
+      this.$refs.dialogForm.validate(async (valid) => {
+        if (valid) {
+          let { action, menuForm } = this;
+          let params = { ...menuForm, action };
+          let res = await this.$api.menuSubmit(params);
+          this.showModal = false;
+          this.$message.success("操作成功");
+          this.handleReset("dialogForm");
+          this.getMenuList();
+        }
+      });
+    },
+    handleClose() {
+      this.showModal = false;
+      this.handleReset("dialogForm");
+    },
   },
 };
 </script>
