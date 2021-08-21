@@ -44,7 +44,10 @@
             <el-button @click="handleEdit(scope.row)" size="mini"
               >编辑</el-button
             >
-            <el-button type="danger" size="mini" @click="handleDel(scope.row)"
+            <el-button
+              type="danger"
+              size="mini"
+              @click="handleDel(scope.row._id)"
               >删除</el-button
             >
           </template>
@@ -236,8 +239,19 @@ export default {
         ); // 判读只有item不为null的时候再拼接
       }
     },
-    handleEdit() {},
-    handleDel() {},
+    handleEdit(row) {
+      this.showModal = true;
+      this.action = "edit";
+      this.$nextTick(() => {
+        Object.assign(this.menuForm, row);
+      });
+    },
+    // 删除表格行
+    async handleDel(_id) {
+      await this.$api.menuSubmit({ _id, action: "delete" });
+      this.$message.success("删除成功");
+      this.getMenuList();
+    },
     // 新增菜单提交
     handleSubmit() {
       this.$refs.dialogForm.validate(async (valid) => {
