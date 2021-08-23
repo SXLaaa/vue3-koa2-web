@@ -1,32 +1,43 @@
 <template>
   <div>
     <template v-for="menu in MenuList">
-      <el-submenu v-if="menu.children && menu.children.length>0 && menu.children[0].menuType == 1" :key="menu._id" :index="menu.path">
+      <el-submenu
+        v-if="
+          menu.children &&
+          menu.children.length > 0 &&
+          menu.children[0].menuType == 1
+        "
+        :key="menu._id"
+        :index="menu.path"
+      >
         <template #title>
           <i :class="menu.icon"></i>
-          <span>{{menu.menuName}}</span>
+          <span>{{ menu.menuName }}</span>
         </template>
-        <tree-menu :MenuList="menu.children"/>
+        <tree-menu :MenuList="menu.children" />
       </el-submenu>
-      <el-menu-item v-else-if="menu.menuType == 1" :index="menu.path" :key="menu._id">{{menu.menuName}}</el-menu-item>
+      <el-menu-item
+        v-else-if="menu.menuType == 1"
+        :index="menu.path"
+        :key="menu._id"
+        >{{ menu.menuName }}</el-menu-item
+      >
     </template>
-  </div>  
+  </div>
 </template>
 
 <script>
 export default {
-  name:'TreeMenu',
-  props:{
-    MenuList:{
+  name: "TreeMenu",
+  props: {
+    MenuList: {
       type: Array,
-      default(){
-        return []
-      }
-    }
-  }
-}
+      default() {
+        return [];
+      },
+    },
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

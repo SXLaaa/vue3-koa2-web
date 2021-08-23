@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Home.vue";
+import apManagerRoute from "./apManager";
 const routes = [
   {
     name: "home",
@@ -43,6 +44,9 @@ const routes = [
       title: "登陆",
     },
     component: () => import("@/views/Login.vue"),
+  },
+  {
+    ...apManagerRoute,
   },
 ];
 const router = createRouter({
