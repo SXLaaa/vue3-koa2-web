@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="cesium">
     <router-view></router-view>
   </div>
 </template>
@@ -8,4 +8,9 @@
 export default {};
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.cesium {
+  width: 100%;
+  height: 100%;
+}
+</style>
