@@ -246,7 +246,7 @@ export default {
     // 初始化接口调用
     onMounted(() => {
       getUserList();
-      getRoleList();
+      getRoleAllList();
       getDepList();
     });
     const getUserList = async () => {
@@ -342,8 +342,8 @@ export default {
       let list = await proxy.$api.getDeptList();
       deptList.value = list;
     };
-    const getRoleList = async () => {
-      let list = await proxy.$api.getRoleList();
+    const getRoleAllList = async () => {
+      let list = await proxy.$api.getRoleAllList();
       roleList.value = list.list;
     };
     return {
@@ -369,7 +369,7 @@ export default {
       handleEdit,
       handleClose,
       handleSubmit,
-      getRoleList,
+      getRoleAllList,
       getDepList,
     };
   },

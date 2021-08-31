@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Version: 2.0
+ * @Autor: 史小雷
+ * @Date: 2021-08-15 16:02:02
+ * @LastEditors: Seven
+ * @LastEditTime: 2021-08-31 23:29:58
+ */
 /**
  * api管理
  */
@@ -46,12 +54,30 @@ export default {
       mock: false,
     });
   },
+  getRoleAllList() {
+    // 角色名称列表
+    return request({
+      url: "/roles/allList",
+      method: "get",
+      data: {},
+      mock: true,
+    });
+  },
   getRoleList() {
     // 角色列表
     return request({
       url: "/roles/list",
       method: "get",
       data: {},
+      mock: true,
+    });
+  },
+  roleOperate(params) {
+    //角色操作
+    return request({
+      url: "/roles/operate",
+      method: "post",
+      data: params,
       mock: true,
     });
   },

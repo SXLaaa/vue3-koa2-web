@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Version: 2.0
+ * @Autor: 史小雷
+ * @Date: 2021-08-11 17:33:12
+ * @LastEditors: Seven
+ * @LastEditTime: 2021-08-31 23:00:23
+ */
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Home.vue";
 import apManagerRoute from "./apManager";
@@ -34,6 +42,14 @@ const routes = [
           title: "菜单管理",
         },
         component: () => import("@/views/Menu.vue"),
+      },
+      {
+        name: "role",
+        path: "/system/role",
+        meta: {
+          title: "角色管理",
+        },
+        component: () => import("@/views/Role.vue"),
       },
     ],
   },
