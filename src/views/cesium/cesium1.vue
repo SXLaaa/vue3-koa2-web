@@ -22,6 +22,9 @@ export default {
         { id: 1, name: "切换1" },
         { id: 2, name: "切换2" },
         { id: 3, name: "切换3" },
+        { id: 4, name: "加载3Dtiles" },
+        { id: 5, name: "画图形" },
+        { id: 6, name: "camera飞行" },
       ],
     };
   },
@@ -40,13 +43,52 @@ export default {
         sceneModePicker: false, //是否显示投影方式控件
         navigationHelpButton: false, //是否显示帮助信息控件
         infoBox: false, //是否显示点击要素之后显示的信息
-        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-          // cesium支持的地图格式及加载方式
-          url: "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+        imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+          //影像底图
+          url:
+            "http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
+            "b7d87c30876f4af87ccd40c1abac5634",
+          subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+          layer: "tdtImgLayer",
+          style: "default",
+          format: "image/jpeg",
+          tileMatrixSetID: "GoogleMapsCompatible", //使用谷歌的瓦片切片方式
+          show: true,
         }),
       });
       this.viewer.scene.debugShowFramesPerSecond = false; // 右上角显示帧速
       this.viewer._cesiumWidget._creditContainer.style.display = "none"; // 隐藏左下角图标
+      this.viewer.imageryLayers.addImageryProvider(
+        new Cesium.WebMapTileServiceImageryProvider({
+          //影像注记
+          url:
+            "http://t{s}.tianditu.com/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default.jpg&tk=" +
+            "b7d87c30876f4af87ccd40c1abac5634",
+          subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+          layer: "tdtCiaLayer",
+          style: "default",
+          format: "image/jpeg",
+          tileMatrixSetID: "GoogleMapsCompatible",
+          show: true,
+        })
+      );
+      this.viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
+        orientation: {
+          heading: Cesium.Math.toRadians(348.4202942851978),
+          pitch: Cesium.Math.toRadians(-89.74026687972041),
+          roll: Cesium.Math.toRadians(0),
+        },
+        complete: function callback() {
+          // 定位完成之后的回调函数
+        },
+      });
+      console.log(this.viewer, "------viewer");
+    },
+    /**
+     * 画图
+     */
+    drawGraphics() {
       // 第一种画图形方法
       var redBox = this.viewer.entities.add({
         name: "Red box with black outline",
@@ -58,7 +100,7 @@ export default {
           outlineColor: Cesium.Color.BLACK,
         },
       });
-      // viewer.zoomTo(viewer.entities);
+      // this.viewer.zoomTo(redBox);
       // 第二种画图形方法
       var czml = [
         {
@@ -92,20 +134,18 @@ export default {
       ];
       var dataSourcePromise = Cesium.CzmlDataSource.load(czml);
       this.viewer.dataSources.add(dataSourcePromise);
-      // viewer.zoomTo(dataSourcePromise);
-      console.log(this.viewer, "------viewer");
+      this.viewer.zoomTo(dataSourcePromise);
     },
+    /**
+     * 添加图层/切换
+     * 2021/08/24 史小雷
+     * ArcGIS 对应 ArcGisMapServerImageryProvider
+     * 天地图（wmts服务）对应 WebMapTileServiceImageryProvider
+     * 高德地图（xyz瓦片图层）对应 UrlTemplateImageryProvider
+     */
     getLayerList(val) {
-      /**
-       * 添加图层/切换
-       * 2021/08/24 史小雷
-       * ArcGIS 对应 ArcGisMapServerImageryProvider
-       * 天地图（wmts服务）对应 WebMapTileServiceImageryProvider
-       * 高德地图（xyz瓦片图层）对应 UrlTemplateImageryProvider
-       */
       switch (val.id) {
         case 1:
-          this.viewerflyToLonLat(110.0, 35.8, 8000, "camera");
           this.viewer.imageryLayers.addImageryProvider(
             new Cesium.ArcGisMapServerImageryProvider({
               url: "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
@@ -113,7 +153,6 @@ export default {
           );
           break;
         case 2:
-          this.viewerflyToLonLat(110.0, 35.8, 5000, "camera");
           this.viewer.imageryLayers.addImageryProvider(
             new Cesium.WebMapTileServiceImageryProvider({
               url: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer",
@@ -124,13 +163,21 @@ export default {
           );
           break;
         case 3:
-          this.viewerflyToLonLat(-122.19, 46.25, 15000.0, "camera");
           this.viewer.imageryLayers.addImageryProvider(
             new Cesium.UrlTemplateImageryProvider({
               url: "https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
               subdomains: ["1", "2", "3", "4"],
             })
           );
+          break;
+        case 4:
+          this.load3DTiles();
+          break;
+        case 5:
+          this.drawGraphics();
+          break;
+        case 6:
+          this.viewerflyToLonLat(110.0, 35.8, 8000, "camera");
           break;
       }
     },
@@ -174,6 +221,30 @@ export default {
       } else {
         // viewer.flyTo
       }
+    },
+    /**
+     * 加载3Dtiles
+     */
+    load3DTiles() {
+      var tileset = new Cesium.Cesium3DTileset({
+        url: Cesium.IonResource.fromAssetId(125737),
+      });
+      this.viewer.scene.primitives.add(tileset);
+      var initialPosition = new Cesium.Cartesian3(
+        -1111583.3721328347,
+        -5855888.151574568,
+        2262561.444696748
+      );
+      var initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(
+        100.0,
+        -15.0,
+        0.0
+      );
+      this.viewer.scene.camera.setView({
+        destination: initialPosition,
+        orientation: initialOrientation,
+        endTransform: Cesium.Matrix4.IDENTITY,
+      });
     },
   },
 };

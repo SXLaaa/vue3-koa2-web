@@ -1,0 +1,439 @@
+{
+    "type": "FeatureCollection",
+    "bbox": [
+        109.54993392876027,
+        19.432847878377495,
+        109.55111381851688,
+        19.434551712772337
+    ],
+    "LayerInfo": {
+        "Workspace": "C:/Users/kq/Desktop/海南/03_sanweizhuji/nongfang/quanliren.k3d",
+        "WorkspaceGuid": "00000000-0000-0000-0000-000000000000",
+        "Dataset": "QLR",
+        "DatasetGuid": "4ADE0D9F-636B-4FFE-A66E-C06C36F1F407",
+        "FeatureClass": "海雅经济合作社",
+        "FeatureClassGuid": "A29228FC-5734-4EB0-8550-10A92AD234EB"
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55016399366247,
+                    19.433226968473009,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "1",
+                "QLR": "蒋国光"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55083598697921,
+                    19.434170201300416,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "2",
+                "QLR": "邱国辉"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55103395240815,
+                    19.434221237446459,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "3",
+                "QLR": "邱亚团"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55105519905216,
+                    19.434550887099868,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "4",
+                "QLR": "符国强"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55079621877516,
+                    19.43382719309472,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "5",
+                "QLR": "杨志强"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5506423248519,
+                    19.433675661142627,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "6",
+                "QLR": "符国军"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55070473669668,
+                    19.43372935167616,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "7",
+                "QLR": "符国光"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55044893470438,
+                    19.433354517720006,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "8",
+                "QLR": "钟亚皇"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55033778480085,
+                    19.43376136738297,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "9",
+                "QLR": "符亚国"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55018113986287,
+                    19.43368445914623,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "10",
+                "QLR": "钟亚南"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55064640959299,
+                    19.433526187868759,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "11",
+                "QLR": "符永新"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55058018474212,
+                    19.433439113638568,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "12",
+                "QLR": "符亚武"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55013538240353,
+                    19.43346307108591,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "13",
+                "QLR": "王志南"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55000767111018,
+                    19.43343366632976,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "14",
+                "QLR": "陈国强"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.54993446955771,
+                    19.433511712265188,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "15",
+                "QLR": "陈亚明"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55001440343263,
+                    19.433611920855534,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "16",
+                "QLR": "赵小荣"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55009287682269,
+                    19.43311668325083,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "17",
+                "QLR": "蒋亚羊"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55004641343847,
+                    19.433009120446987,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "18",
+                "QLR": "周少华"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5503894415151,
+                    19.433032741881016,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "19",
+                "QLR": "蒋亚观"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55110684365589,
+                    19.43432046341893,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "20",
+                "QLR": "邱国明"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5507499155264,
+                    19.434022772688694,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "21",
+                "QLR": "邱亚年"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55103657320095,
+                    19.434409615713308,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "22",
+                "QLR": "邱文亮"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55085085362865,
+                    19.434028636842453,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "23",
+                "QLR": "邱国强"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55056605207078,
+                    19.433910482392688,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "24",
+                "QLR": "符亚年"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55111336188912,
+                    19.43399600692629,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "25",
+                "QLR": "邱文峰"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55068566508399,
+                    19.433050894477554,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "26",
+                "QLR": "符国华"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55019003048861,
+                    19.433391516108548,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "27",
+                "QLR": "王志南"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.55001901038064,
+                    19.432848684895757,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "28",
+                "QLR": "蒋亚辉"
+            }
+        }
+    ]
+}

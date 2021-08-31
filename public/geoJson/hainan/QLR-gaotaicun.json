@@ -1,0 +1,334 @@
+{
+    "type": "FeatureCollection",
+    "bbox": [
+        109.57407206882772,
+        19.422557077200439,
+        109.574844426752,
+        19.42344696703509
+    ],
+    "LayerInfo": {
+        "Workspace": "C:/Users/kq/Desktop/海南/03_sanweizhuji/nongfang/quanliren.k3d",
+        "WorkspaceGuid": "00000000-0000-0000-0000-000000000000",
+        "Dataset": "QLR",
+        "DatasetGuid": "4ADE0D9F-636B-4FFE-A66E-C06C36F1F407",
+        "FeatureClass": "权利人注记",
+        "FeatureClassGuid": "5FA4C93D-A987-4B2C-941D-8809A4DBAEA3"
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57407237903012,
+                    19.422879897512034,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "1",
+                "QLR": "高景"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57484410129936,
+                    19.423109969235069,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "2",
+                "QLR": "高亚其"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57479666951235,
+                    19.422836739896849,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "3",
+                "QLR": "高亚昌"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57454745004769,
+                    19.422832828707148,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "4",
+                "QLR": "高小那"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57436799528266,
+                    19.422830461982149,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "5",
+                "QLR": "高章"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5743044299788,
+                    19.422726218860907,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "6",
+                "QLR": "高贵定"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57423054322675,
+                    19.422584316855305,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "7",
+                "QLR": "高贵土"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57446091105347,
+                    19.422688262163047,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "8",
+                "QLR": "陈桂平"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57442870441789,
+                    19.422557438060389,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "9",
+                "QLR": "陈桂新"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5746167181192,
+                    19.42258143731453,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "10",
+                "QLR": "陈石海"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57465701843907,
+                    19.42318445596423,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "11",
+                "QLR": "唐春芳"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57410506124131,
+                    19.423004108933136,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "12",
+                "QLR": "高亚利"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57439518592533,
+                    19.422918217460976,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "13",
+                "QLR": "高亚显"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57434351638352,
+                    19.423085424108206,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "14",
+                "QLR": "高亚辉"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57423832429623,
+                    19.42317390513481,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "15",
+                "QLR": "王记才"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5743839530297,
+                    19.42320679073067,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "16",
+                "QLR": "周国锋"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57444118817966,
+                    19.42334519961141,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "17",
+                "QLR": "高贵先"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57450642139342,
+                    19.423446590778846,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "18",
+                "QLR": "高求"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57467167302142,
+                    19.423306266615606,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "19",
+                "QLR": "高亚发"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.57462112615282,
+                    19.42305050830405,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "20",
+                "QLR": "高亚定"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    109.5745768394036,
+                    19.422949455064165,
+                    10.0
+                ]
+            },
+            "properties": {
+                "oid": "21",
+                "QLR": "高文祥"
+            }
+        }
+    ]
+}

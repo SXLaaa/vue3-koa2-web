@@ -29,6 +29,14 @@ const apManagerRoute = {
           },
           component: () => import("@/views/cesium/cesium1.vue"),
         },
+        {
+          name: "cesium2",
+          path: "cesium2",
+          meta: {
+            title: "图层调整",
+          },
+          component: () => import("@/views/cesium/cesium2.vue"),
+        },
       ],
     },
     {

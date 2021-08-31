@@ -1,0 +1,954 @@
+{
+    "type": "FeatureCollection",
+    "bbox": [
+        110.46609645056674,
+        19.272696497979387,
+        110.47093357778908,
+        19.280614794884185
+    ],
+    "LayerInfo": {
+        "Workspace": "E:/data/海南社管/成果数据710/楼栋号/louhao.k3d",
+        "WorkspaceGuid": "00000000-0000-0000-0000-000000000000",
+        "Dataset": "louhao",
+        "DatasetGuid": "D9B7F5D6-A981-4F03-86EE-C2EFAC9F4BC7",
+        "FeatureClass": "楼栋号",
+        "FeatureClassGuid": "B62E5015-036D-4F36-8B63-7FA6D9638275"
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46629459997436,
+                    19.28055890682302,
+                    73.9999993769452
+                ]
+            },
+            "properties": {
+                "oid": "1",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "34号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46713382447226,
+                    19.280579580128586,
+                    73.99999946542084
+                ]
+            },
+            "properties": {
+                "oid": "2",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "33号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46805021301019,
+                    19.280606497230669,
+                    73.99999951943755
+                ]
+            },
+            "properties": {
+                "oid": "3",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "32号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46991859164267,
+                    19.28053155844618,
+                    73.99999932851643
+                ]
+            },
+            "properties": {
+                "oid": "4",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "30号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46905702440385,
+                    19.28053549947487,
+                    73.99999942909926
+                ]
+            },
+            "properties": {
+                "oid": "5",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "31号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46933849179479,
+                    19.27998003902821,
+                    73.9999996079132
+                ]
+            },
+            "properties": {
+                "oid": "6",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "22号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47009793890294,
+                    19.280032406219698,
+                    70.99999937880784
+                ]
+            },
+            "properties": {
+                "oid": "7",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "29号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.4702936890265,
+                    19.279486295508776,
+                    70.99999956786633
+                ]
+            },
+            "properties": {
+                "oid": "8",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "28号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46969390461978,
+                    19.279209610822858,
+                    73.99999952595681
+                ]
+            },
+            "properties": {
+                "oid": "9",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "20号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46845928303246,
+                    19.279794796637686,
+                    58.999999314546588
+                ]
+            },
+            "properties": {
+                "oid": "10",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "21号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46751193328075,
+                    19.27987713671854,
+                    73.99999823700637
+                ]
+            },
+            "properties": {
+                "oid": "11",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "36号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46639135112408,
+                    19.279800559826144,
+                    73.99999684933573
+                ]
+            },
+            "properties": {
+                "oid": "12",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "35号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.4662065955284,
+                    19.279272739964467,
+                    64.9999997485429
+                ]
+            },
+            "properties": {
+                "oid": "13",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "14号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46677629091936,
+                    19.27918223098548,
+                    37.999998237006369
+                ]
+            },
+            "properties": {
+                "oid": "14",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "37号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46728979472663,
+                    19.279442784629479,
+                    37.9999971287325
+                ]
+            },
+            "properties": {
+                "oid": "15",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "38号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46778696644276,
+                    19.279379898033065,
+                    37.999997093342248
+                ]
+            },
+            "properties": {
+                "oid": "16",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "39号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46617499815804,
+                    19.27873430657502,
+                    64.9999999254942
+                ]
+            },
+            "properties": {
+                "oid": "17",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "13号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46872620796994,
+                    19.278969105039047,
+                    58.99999933689833
+                ]
+            },
+            "properties": {
+                "oid": "18",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "19号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46818677401503,
+                    19.27907814534588,
+                    37.999996894039217
+                ]
+            },
+            "properties": {
+                "oid": "19",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "40号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46846209166196,
+                    19.27863747244258,
+                    37.99999731592834
+                ]
+            },
+            "properties": {
+                "oid": "20",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "41号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46729057121483,
+                    19.27838620645962,
+                    37.99999689962715
+                ]
+            },
+            "properties": {
+                "oid": "21",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "10号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46767988957106,
+                    19.27864017855815,
+                    37.999997300095859
+                ]
+            },
+            "properties": {
+                "oid": "22",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "11号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46758594045497,
+                    19.277927886113497,
+                    37.999997494742277
+                ]
+            },
+            "properties": {
+                "oid": "23",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "8号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46798358978615,
+                    19.278165212083235,
+                    37.999997083097699
+                ]
+            },
+            "properties": {
+                "oid": "24",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "9号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46621516633816,
+                    19.27798367200504,
+                    64.99999974761158
+                ]
+            },
+            "properties": {
+                "oid": "25",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "12号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47062576261772,
+                    19.27863311594275,
+                    70.99999918136746
+                ]
+            },
+            "properties": {
+                "oid": "26",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "27号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46989374139295,
+                    19.27838472415203,
+                    73.99999917671085
+                ]
+            },
+            "properties": {
+                "oid": "27",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "18号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47072197102847,
+                    19.278081615380807,
+                    70.999999249354
+                ]
+            },
+            "properties": {
+                "oid": "28",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "26号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47076028538781,
+                    19.27753233240201,
+                    70.99999868497253
+                ]
+            },
+            "properties": {
+                "oid": "29",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "25号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47080200846911,
+                    19.277004191633034,
+                    70.99999701231718
+                ]
+            },
+            "properties": {
+                "oid": "30",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "24号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.47092143657534,
+                    19.276492863973688,
+                    70.99999869894237
+                ]
+            },
+            "properties": {
+                "oid": "31",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "23号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46977973392461,
+                    19.27757177038486,
+                    73.99999931268394
+                ]
+            },
+            "properties": {
+                "oid": "32",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "17号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46972362134308,
+                    19.27699306760037,
+                    64.99999923165888
+                ]
+            },
+            "properties": {
+                "oid": "33",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "16号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46995327218893,
+                    19.276340119162265,
+                    64.99999915342778
+                ]
+            },
+            "properties": {
+                "oid": "34",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "15号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46885070423004,
+                    19.27808745047788,
+                    58.99999929778278
+                ]
+            },
+            "properties": {
+                "oid": "35",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "7号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46904533293788,
+                    19.277282538289563,
+                    73.99999984633178
+                ]
+            },
+            "properties": {
+                "oid": "36",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "4号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46913658481485,
+                    19.27633550252397,
+                    64.99999939091504
+                ]
+            },
+            "properties": {
+                "oid": "37",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "2号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46834439285493,
+                    19.277695331566546,
+                    58.999998070299628
+                ]
+            },
+            "properties": {
+                "oid": "38",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "6号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46776203285161,
+                    19.277535038119678,
+                    58.999995357356969
+                ]
+            },
+            "properties": {
+                "oid": "39",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "5号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46814609786363,
+                    19.276998178478448,
+                    73.99999899230898
+                ]
+            },
+            "properties": {
+                "oid": "40",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "3号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46820257151124,
+                    19.276297982682516,
+                    64.99999959394336
+                ]
+            },
+            "properties": {
+                "oid": "41",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "1号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46611358117348,
+                    19.275313269955409,
+                    64.99999873992056
+                ]
+            },
+            "properties": {
+                "oid": "42",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "42号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46668051047351,
+                    19.275261575216687,
+                    64.99999852478504
+                ]
+            },
+            "properties": {
+                "oid": "43",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "43号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46760126138054,
+                    19.275337010919974,
+                    64.99999924749136
+                ]
+            },
+            "properties": {
+                "oid": "44",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "44号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46628361179904,
+                    19.27454657184351,
+                    73.99999959114939
+                ]
+            },
+            "properties": {
+                "oid": "45",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "45号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46710423685417,
+                    19.274516557605656,
+                    85.99999936576933
+                ]
+            },
+            "properties": {
+                "oid": "46",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "46号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46792243964974,
+                    19.274556021532164,
+                    73.99999957717955
+                ]
+            },
+            "properties": {
+                "oid": "47",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "47号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46621039966543,
+                    19.273954205532058,
+                    73.99999955575913
+                ]
+            },
+            "properties": {
+                "oid": "48",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "48号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46820680937447,
+                    19.273912034275697,
+                    73.99999950826168
+                ]
+            },
+            "properties": {
+                "oid": "49",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "49号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46630043004984,
+                    19.27333026190605,
+                    73.99999955575913
+                ]
+            },
+            "properties": {
+                "oid": "50",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "50号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46710407660182,
+                    19.273343724067855,
+                    85.99999845586717
+                ]
+            },
+            "properties": {
+                "oid": "51",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "51号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46823692598433,
+                    19.27336106359723,
+                    73.99999915715307
+                ]
+            },
+            "properties": {
+                "oid": "52",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "52号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46622218304079,
+                    19.27271302410596,
+                    73.99999955203384
+                ]
+            },
+            "properties": {
+                "oid": "53",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "53号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46721517418735,
+                    19.272700541440576,
+                    73.99999955948442
+                ]
+            },
+            "properties": {
+                "oid": "54",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "54号楼"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    110.46825139011266,
+                    19.27270270468065,
+                    73.99999951478094
+                ]
+            },
+            "properties": {
+                "oid": "55",
+                "ObjectId": "0",
+                "Id": "0",
+                "CODE": "55号楼"
+            }
+        }
+    ]
+}
