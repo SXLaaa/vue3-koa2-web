@@ -344,7 +344,8 @@ export default {
     };
     const getRoleAllList = async () => {
       let list = await proxy.$api.getRoleAllList();
-      roleList.value = list.list;
+      console.log(list, "===");
+      roleList.value = list;
     };
     return {
       user,

@@ -4,7 +4,7 @@
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
  * @LastEditors: Seven
- * @LastEditTime: 2021-08-31 23:29:58
+ * @LastEditTime: 2021-09-05 09:20:29
  */
 /**
  * api管理
@@ -76,6 +76,15 @@ export default {
     //角色操作
     return request({
       url: "/roles/operate",
+      method: "post",
+      data: params,
+      mock: true,
+    });
+  },
+  updatePermission(params) {
+    // 更新角色权限
+    return request({
+      url: "/roles/update/permission",
       method: "post",
       data: params,
       mock: true,

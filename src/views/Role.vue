@@ -37,7 +37,9 @@
             <el-button size="mini" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button size="mini">设置权限</el-button>
+            <el-button size="mini" @click="handleOpenPermission(scope.row)"
+              >设置权限</el-button
+            >
             <el-button
               type="danger"
               size="mini"
@@ -84,6 +86,33 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 权限弹框-->
+    <el-dialog title="权限设置" v-model="showPermission">
+      <el-form label-width="100px">
+        <el-form-item label="角色名称">
+          {{ curRoleName }}
+        </el-form-item>
+        <el-form-item label="选择权限">
+          <el-tree
+            ref="tree"
+            :data="menuList"
+            show-checkbox
+            node-key="_id"
+            default-expand-all
+            :props="{ label: 'menuName' }"
+          >
+          </el-tree>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showPermission = false">取 消</el-button>
+          <el-button type="primary" @click="handlePermissionSubmit"
+            >确 定</el-button
+          >
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -117,7 +146,15 @@ export default {
         },
         {
           label: "权限列表",
-          prop: "menuType",
+          prop: "permissionList",
+          formatter: (row, column, value) => {
+            let names = [];
+            let list = value.halfCheckedKeys || [];
+            list.map((key) => {
+              if (key) names.push(this.actionMap[key]);
+            });
+            return names.join(",");
+          },
         },
         {
           label: "创建时间",
@@ -132,18 +169,34 @@ export default {
         total: 0,
         pageSize: 10,
       },
+      showPermission: false, // 权限展示
+      curRoleName: "",
+      curRoleId: "",
+      menuList: [],
+      actionMap: {}, // 菜单映射表
     };
   },
   mounted() {
     this.getRoleList();
+    this.getMenuList();
   },
   methods: {
-    // 列表初始化查询
+    // 角色列表初始化查询
     async getRoleList() {
       try {
         let { list, page } = await this.$api.getRoleList(this.queryForm);
         this.roleList = list;
         this.pager.total = page.total;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    // 菜单获取权限树图
+    async getMenuList() {
+      try {
+        let list = await this.$api.getMenuList();
+        this.menuList = list;
+        this.getActionMap(list);
       } catch (error) {
         throw new Error(error);
       }
@@ -188,10 +241,62 @@ export default {
         }
       });
     },
+    // 设置权限
+    handleOpenPermission(row) {
+      this.curRoleId = row._id;
+      this.curRoleName = row.roleName;
+      this.showPermission = true;
+      let { checkedKeys } = row.permissionList;
+      setTimeout(() => {
+        this.$refs.tree.setCheckedKeys(checkedKeys);
+      });
+    },
+    // 编辑权限设置
+    async handlePermissionSubmit() {
+      let nodes = this.$refs.tree.getCheckedNodes(); // getCheckedNodes 返回目前被选中节点组成的数组
+      let halfKeys = this.$refs.tree.getHalfCheckedKeys(); // 返回目前办选中节点的key，组成的数组
+      console.log(nodes, halfKeys);
+      let checkedKeys = []; // 选中的按钮
+      let parentKeys = []; // 选中的菜单
+      nodes.map((node) => {
+        if (!node.children) {
+          checkedKeys.push(node._id);
+        } else {
+          parentKeys.push(node._id);
+        }
+      });
+      let params = {
+        _id: this.curRoleId, // 当前行id
+        permissionList: {
+          checkedKeys, // 选中的子菜单
+          halfCheckedKeys: parentKeys.concat(halfKeys), // 半选中的父菜单(parentKeys 用户管理，halfKeys 系统管理 )
+        },
+      };
+      await this.$api.updatePermission(params);
+      this.showPermission = false;
+      this.$message.success("设置成功");
+      this.getRoleList();
+    },
     // 关闭弹框
     handleClose() {
       this.handleReset("dialogForm");
       this.showModal = false;
+    },
+    getActionMap(list) {
+      let actionMap = {};
+      const deep = (arr) => {
+        while (arr.length) {
+          let item = arr.pop();
+          if (item.children && item.action) {
+            actionMap[item._id] = item.menuName;
+          }
+          if (item.children && !item.action) {
+            deep(item.children);
+          }
+        }
+      };
+      deep(JSON.parse(JSON.stringify(list)));
+      this.actionMap = actionMap;
     },
   },
 };
