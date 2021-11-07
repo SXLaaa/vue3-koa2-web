@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
- * @LastEditors: Seven
- * @LastEditTime: 2021-09-05 09:20:29
+ * @LastEditors: shiXl
+ * @LastEditTime: 2021-09-05 23:24:01
  */
 /**
  * api管理
@@ -55,30 +55,30 @@ export default {
     });
   },
   getRoleAllList() {
-    // 角色名称列表
+    // 角色名称列表(全部)
     return request({
       url: "/roles/allList",
       method: "get",
       data: {},
-      mock: true,
+      mock: false,
     });
   },
-  getRoleList() {
+  getRoleList(params) {
     // 角色列表
     return request({
       url: "/roles/list",
       method: "get",
-      data: {},
-      mock: true,
+      data: params,
+      mock: false,
     });
   },
   roleOperate(params) {
-    //角色操作
+    //角色操作= 创建、编辑、删除
     return request({
       url: "/roles/operate",
       method: "post",
       data: params,
-      mock: true,
+      mock: false,
     });
   },
   updatePermission(params) {
@@ -87,7 +87,7 @@ export default {
       url: "/roles/update/permission",
       method: "post",
       data: params,
-      mock: true,
+      mock: false,
     });
   },
   getDeptList() {

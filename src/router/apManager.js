@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Version: 2.0
+ * @Autor: shiXl
+ * @Date: 2021-08-22 20:50:32
+ * @LastEditors: shiXl
+ * @LastEditTime: 2021-09-06 02:21:42
+ */
 import Home from "@/components/Home.vue";
 const apManagerRoute = {
   name: "apManager",
@@ -36,6 +44,14 @@ const apManagerRoute = {
             title: "图层调整",
           },
           component: () => import("@/views/cesium/cesium2.vue"),
+        },
+        {
+          name: "cesium3",
+          path: "cesium3",
+          meta: {
+            title: "图层调整",
+          },
+          component: () => import("@/views/cesium/cesium3.vue"),
         },
       ],
     },

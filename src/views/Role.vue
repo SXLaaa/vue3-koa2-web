@@ -147,11 +147,13 @@ export default {
         {
           label: "权限列表",
           prop: "permissionList",
+          width: 200,
           formatter: (row, column, value) => {
             let names = [];
             let list = value.halfCheckedKeys || [];
             list.map((key) => {
-              if (key) names.push(this.actionMap[key]);
+              let name = this.actionMap[key];
+              if (key && name) names.push(name);
             });
             return names.join(",");
           },
@@ -163,10 +165,18 @@ export default {
             return utils.formateDate(new Date(value));
           },
         },
+        {
+          label: "更新时间",
+          prop: "updateTime",
+          formatter(row, column, value) {
+            return utils.formateDate(new Date(value));
+          },
+        },
       ],
       roleList: [],
       pager: {
         total: 0,
+        pageNum: 1,
         pageSize: 10,
       },
       showPermission: false, // 权限展示
@@ -184,7 +194,10 @@ export default {
     // 角色列表初始化查询
     async getRoleList() {
       try {
-        let { list, page } = await this.$api.getRoleList(this.queryForm);
+        let { list, page } = await this.$api.getRoleList({
+          ...this.queryForm,
+          ...this.pager,
+        });
         this.roleList = list;
         this.pager.total = page.total;
       } catch (error) {
@@ -211,7 +224,11 @@ export default {
       this.action = "edit";
       this.showModal = true;
       this.$nextTick(() => {
-        Object.assign(this.roleForm, row);
+        this.roleForm = {
+          _id: row._id,
+          roleName: row.roleName,
+          remark: row.remark,
+        };
       });
     },
     //  删除角色
@@ -224,7 +241,11 @@ export default {
     handleReset(form) {
       this.$refs[form].resetFields();
     },
-    handleCurrentChange() {},
+    // 分页点击事件
+    handleCurrentChange(current) {
+      this.pager.pageNum = current;
+      this.getRoleList();
+    },
     // 角色提交
     handleSubmit() {
       this.$refs.dialogForm.validate(async (valid) => {
@@ -254,8 +275,7 @@ export default {
     // 编辑权限设置
     async handlePermissionSubmit() {
       let nodes = this.$refs.tree.getCheckedNodes(); // getCheckedNodes 返回目前被选中节点组成的数组
-      let halfKeys = this.$refs.tree.getHalfCheckedKeys(); // 返回目前办选中节点的key，组成的数组
-      console.log(nodes, halfKeys);
+      let halfKeys = this.$refs.tree.getHalfCheckedKeys(); // 返回半选中的节点的 key 所组成的数组
       let checkedKeys = []; // 选中的按钮
       let parentKeys = []; // 选中的菜单
       nodes.map((node) => {
