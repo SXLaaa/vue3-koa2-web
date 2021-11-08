@@ -3,8 +3,8 @@
  * @Version: 2.0
  * @Autor: 史小雷
  * @Date: 2021-08-11 17:33:12
- * @LastEditors: Seven
- * @LastEditTime: 2021-08-31 23:00:23
+ * @LastEditors: shiXl
+ * @LastEditTime: 2021-11-07 15:16:53
  */
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Home.vue";
@@ -50,6 +50,14 @@ const routes = [
           title: "角色管理",
         },
         component: () => import("@/views/Role.vue"),
+      },
+      {
+        name: "dept",
+        path: "/system/dept",
+        meta: {
+          title: "部门管理",
+        },
+        component: () => import("@/views/Dept.vue"),
       },
     ],
   },

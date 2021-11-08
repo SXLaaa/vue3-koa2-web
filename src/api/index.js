@@ -4,7 +4,7 @@
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
  * @LastEditors: shiXl
- * @LastEditTime: 2021-09-05 23:24:01
+ * @LastEditTime: 2021-11-07 19:06:01
  */
 /**
  * api管理
@@ -42,6 +42,15 @@ export default {
       url: "/users/list",
       method: "get",
       data: params,
+      mock: false,
+    });
+  },
+  getAllUserList(params) {
+    // 获用所有户列表
+    return request({
+      url: "/users/all/list",
+      method: "get",
+      data: {},
       mock: false,
     });
   },
@@ -90,13 +99,22 @@ export default {
       mock: false,
     });
   },
-  getDeptList() {
+  getDeptList(params) {
     //部门列表
     return request({
       url: "/dept/list",
       method: "get",
-      data: {},
-      mock: true,
+      data: params,
+      mock: false,
+    });
+  },
+  deptOperate(params) {
+    //部门创建、编辑、删除
+    return request({
+      url: "/dept/operate",
+      method: "post",
+      data: params,
+      mock: false,
     });
   },
   userSubmit(params) {
