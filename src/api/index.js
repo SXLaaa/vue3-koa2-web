@@ -4,7 +4,7 @@
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
  * @LastEditors: shiXl
- * @LastEditTime: 2021-11-07 19:06:01
+ * @LastEditTime: 2021-11-16 23:44:15
  */
 /**
  * api管理
@@ -33,6 +33,15 @@ export default {
       url: "/menu/list",
       method: "get",
       data: params,
+      mock: false,
+    });
+  },
+  getPermissionList() {
+    // 获取用户对应的权限菜单
+    return request({
+      url: "/users/getPermissionList",
+      method: "get",
+      data: {},
       mock: false,
     });
   },
