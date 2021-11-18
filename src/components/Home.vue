@@ -100,8 +100,10 @@ export default {
     },
     async getMenuList() {
       try {
-        const menuList = await this.$api.getPermissionList();
+        const { menuList, actionList } = await this.$api.getPermissionList();
         this.menuList = menuList;
+        this.$store.commit("saveUserMenu", menuList);
+        this.$store.commit("saveUserAction", actionList);
       } catch (error) {
         console.error(error);
       }
