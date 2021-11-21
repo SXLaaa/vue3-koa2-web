@@ -152,7 +152,6 @@ export default {
           formatter: (row, column, value) => {
             let names = [];
             let list = value.halfCheckedKeys || [];
-            console.log(list);
             list.map((key) => {
               let name = this.actionMap[key];
               if (key && name) names.push(name);

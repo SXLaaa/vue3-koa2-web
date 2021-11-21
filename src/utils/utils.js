@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Version: 2.0
+ * @Autor: shiXl
+ * @Date: 2021-08-15 16:53:05
+ * @LastEditors: shiXl
+ * @LastEditTime: 2021-11-21 15:45:13
+ */
 /**
  * 工具函数封装
  */
@@ -29,5 +37,27 @@ export default {
       }
     }
     return fmt;
+  },
+  generateRoute(menuList) {
+    let routes = [];
+    const deepList = (list) => {
+      while (list.length) {
+        let item = list.pop();
+        if (item.action) {
+          routes.push({
+            name: item.menuName,
+            path: item.path,
+            meta: {
+              title: item.menuName,
+            },
+            component: item.component,
+          });
+        } else if (item.children && !item.action) {
+          deepList(item.children);
+        }
+      }
+    };
+    deepList(menuList);
+    return routes;
   },
 };
