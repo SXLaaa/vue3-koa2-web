@@ -4,7 +4,7 @@
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
  * @LastEditors: shiXl
- * @LastEditTime: 2021-11-16 23:44:15
+ * @LastEditTime: 2022-02-10 10:48:30
  */
 /**
  * api管理
@@ -144,4 +144,22 @@ export default {
       mock: false,
     });
   },
+  getApplyList(params) {
+    // 休假申请列表
+    return request({
+      url: "/leave/list",
+      method: "get",
+      data: params,
+      mock: false,
+    });
+  },
+  leaveOperate(params){
+     // 创建休假申请
+     return request({
+      url: "/leave/operate",
+      method: "post",
+      data: params,
+      mock: false,
+    });
+  }
 };

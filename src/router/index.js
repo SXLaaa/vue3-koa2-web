@@ -4,11 +4,10 @@
  * @Autor: 史小雷
  * @Date: 2021-08-11 17:33:12
  * @LastEditors: shiXl
- * @LastEditTime: 2021-11-21 15:51:29
+ * @LastEditTime: 2022-02-10 10:23:28
  */
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Home.vue";
-import apManagerRoute from "./apManager";
 import storage from "./../utils/storage";
 import API from "./../api";
 import utils from "./../utils/utils";
@@ -30,38 +29,6 @@ const routes = [
         },
         component: () => import("@/views/Welcome.vue"),
       },
-      // {
-      //   name: "user",
-      //   path: "/system/user",
-      //   meta: {
-      //     title: "用户管理",
-      //   },
-      //   component: () => import("@/views/User.vue"),
-      // },
-      // {
-      //   name: "menu",
-      //   path: "/system/menu",
-      //   meta: {
-      //     title: "菜单管理",
-      //   },
-      //   component: () => import("@/views/Menu.vue"),
-      // },
-      // {
-      //   name: "role",
-      //   path: "/system/role",
-      //   meta: {
-      //     title: "角色管理",
-      //   },
-      //   component: () => import("@/views/Role.vue"),
-      // },
-      // {
-      //   name: "dept",
-      //   path: "/system/dept",
-      //   meta: {
-      //     title: "部门管理",
-      //   },
-      //   component: () => import("@/views/Dept.vue"),
-      // },
     ],
   },
   {
@@ -80,9 +47,6 @@ const routes = [
     },
     component: () => import("@/views/404.vue"),
   },
-  {
-    // ...apManagerRoute,
-  },
 ];
 const router = createRouter({
   history: createWebHashHistory(),
@@ -94,22 +58,24 @@ async function loadAsyncRoutes() {
     try {
       const { menuList } = await API.getPermissionList();
       let routes = utils.generateRoute(menuList);
-      console.log(routes, "--routes");
+      console.log(routes, "--routes1");
       routes.map((route) => {
         let url = `./../views/${route.component}.vue`;
         route.component = () => import(url);
         router.addRoute("home", route);
       });
+      console.log(router.getRoutes(), "--routes2");
     } catch (error) {}
   }
 }
-await loadAsyncRoutes();
+loadAsyncRoutes();
 
 /**
  * 判断当前地址是否可以访问
  * router.getRoutes() 获取全量路由地址
  */
 function checkoutPermission(path) {
+  console.log(router.getRoutes(), "--routes3");
   let hasPermission = router
     .getRoutes()
     .filter((route) => route.path == path).length;
