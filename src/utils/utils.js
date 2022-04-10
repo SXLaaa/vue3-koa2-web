@@ -4,7 +4,7 @@
  * @Autor: shiXl
  * @Date: 2021-08-15 16:53:05
  * @LastEditors: shiXl
- * @LastEditTime: 2021-11-21 15:45:13
+ * @LastEditTime: 2022-04-08 20:07:48
  */
 /**
  * 工具函数封装
@@ -39,25 +39,26 @@ export default {
     return fmt;
   },
   generateRoute(menuList) {
-    let routes = [];
+    let routes = []
     const deepList = (list) => {
-      while (list.length) {
-        let item = list.pop();
-        if (item.action) {
-          routes.push({
-            name: item.menuName,
-            path: item.path,
-            meta: {
-              title: item.menuName,
-            },
-            component: item.component,
-          });
-        } else if (item.children && !item.action) {
-          deepList(item.children);
+        while (list.length) {
+            let item = list.pop()
+            if (item.action) {
+                routes.push({
+                    name: item.component,
+                    path: item.path,
+                    meta: {
+                        title: item.menuName
+                    },
+                    component: item.component
+                })
+            }
+            if (item.children && !item.action) {
+                deepList(item.children)
+            }
         }
-      }
-    };
-    deepList(menuList);
+    }
+    deepList(menuList)
     return routes;
-  },
+}
 };

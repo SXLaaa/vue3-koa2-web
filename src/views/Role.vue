@@ -1,19 +1,13 @@
 <template>
-  <div class="role-manag">
+  <div class="role-manage">
     <div class="query-form">
       <el-form ref="form" :inline="true" :model="queryForm">
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="queryForm.roleName" placeholder="请输入用户ID" />
-        </el-form-item>
-        <el-form-item label="菜单状态" prop="menuState">
-          <el-select v-model="queryForm.menuState">
-            <el-option :value="1" label="正常"></el-option>
-            <el-option :value="2" label="停用"></el-option>
-          </el-select>
+          <el-input v-model="queryForm.roleName" placeholder="请输入角色名称" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getRoleList">查询</el-button>
-          <el-button @click="handleReset(form)">重置</el-button>
+          <el-button @click="handleReset('form')">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -22,7 +16,6 @@
         <el-button type="primary" @click="handleAdd">创建</el-button>
       </div>
       <el-table :data="roleList">
-        <el-table-column type="selection" width="55" />
         <el-table-column
           v-for="item in columns"
           :key="item.prop"
@@ -37,7 +30,10 @@
             <el-button size="mini" @click="handleEdit(scope.row)"
               >编辑</el-button
             >
-            <el-button size="mini" @click="handleOpenPermission(scope.row)"
+            <el-button
+              size="mini"
+              type="primary"
+              @click="handleOpenPermission(scope.row)"
               >设置权限</el-button
             >
             <el-button
@@ -51,13 +47,13 @@
       </el-table>
       <el-pagination
         class="pagination"
+        background
         layout="prev, pager, next"
         :total="pager.total"
         :page-size="pager.pageSize"
         @current-change="handleCurrentChange"
       />
     </div>
-
     <el-dialog title="用户新增" v-model="showModal">
       <el-form
         ref="dialogForm"
@@ -66,11 +62,9 @@
         :rules="rules"
       >
         <el-form-item label="角色名称" prop="roleName">
-          <el-input
-            v-model="roleForm.roleName"
-            placeholder="请输入角色名称"
-          ></el-input> </el-form-item
-        ><el-form-item label="备注" prop="remark">
+          <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
           <el-input
             type="textarea"
             :rows="2"
@@ -117,24 +111,12 @@
 </template>
 <script>
 import utils from "../utils/utils";
-import { toRaw } from "vue";
 export default {
   name: "role",
   data() {
     return {
       queryForm: {
         roleName: "",
-      },
-      roleForm: {},
-      showModal: false,
-      action: "create",
-      rules: {
-        roleName: [
-          {
-            required: true,
-            message: "请输入角色角色名称",
-          },
-        ],
       },
       columns: [
         {
@@ -160,15 +142,15 @@ export default {
           },
         },
         {
-          label: "创建时间",
-          prop: "createTime",
+          label: "更新时间",
+          prop: "updateTime",
           formatter(row, column, value) {
             return utils.formateDate(new Date(value));
           },
         },
         {
-          label: "更新时间",
-          prop: "updateTime",
+          label: "创建时间",
+          prop: "createTime",
           formatter(row, column, value) {
             return utils.formateDate(new Date(value));
           },
@@ -180,11 +162,24 @@ export default {
         pageNum: 1,
         pageSize: 10,
       },
-      showPermission: false, // 权限展示
-      curRoleName: "",
+      showModal: false,
+      action: "create",
+      roleForm: {},
+      rules: {
+        roleName: [
+          {
+            required: true,
+            message: "请输入角色角色名称",
+          },
+        ],
+      },
+      // 权限展示
+      showPermission: false,
       curRoleId: "",
+      curRoleName: "",
       menuList: [],
-      actionMap: {}, // 菜单映射表
+      // 菜单映射表
+      actionMap: {},
     };
   },
   mounted() {
@@ -192,7 +187,7 @@ export default {
     this.getMenuList();
   },
   methods: {
-    // 角色列表初始化查询
+    // 角色列表初始化
     async getRoleList() {
       try {
         let { list, page } = await this.$api.getRoleList({
@@ -201,26 +196,30 @@ export default {
         });
         this.roleList = list;
         this.pager.total = page.total;
-      } catch (error) {
-        throw new Error(error);
+      } catch (e) {
+        throw new Error(e);
       }
     },
-    // 菜单获取权限树图
+    // 菜单列表初始化
     async getMenuList() {
       try {
         let list = await this.$api.getMenuList();
         this.menuList = list;
         this.getActionMap(list);
-      } catch (error) {
-        throw new Error(error);
+      } catch (e) {
+        throw new Error(e);
       }
     },
-    // 创建角色
+    // 表单重置
+    handleReset(form) {
+      this.$refs[form].resetFields();
+    },
+    // 角色添加
     handleAdd() {
       this.action = "create";
       this.showModal = true;
     },
-    // 编辑角色
+    // 角色编辑
     handleEdit(row) {
       this.action = "edit";
       this.showModal = true;
@@ -232,20 +231,16 @@ export default {
         };
       });
     },
-    //  删除角色
+    // 角色删除
     async handleDel(_id) {
       await this.$api.roleOperate({ _id, action: "delete" });
       this.$message.success("删除成功");
       this.getRoleList();
     },
-    // 表单重置
-    handleReset(form) {
-      this.$refs[form].resetFields();
-    },
-    // 分页点击事件
-    handleCurrentChange(current) {
-      this.pager.pageNum = current;
-      this.getRoleList();
+    // 弹框关闭
+    handleClose() {
+      this.handleReset("dialogForm");
+      this.showModal = false;
     },
     // 角色提交
     handleSubmit() {
@@ -263,7 +258,10 @@ export default {
         }
       });
     },
-    // 设置权限
+    handleCurrentChange(current) {
+      this.pager.pageNum = current;
+      this.getRoleList();
+    },
     handleOpenPermission(row) {
       this.curRoleId = row._id;
       this.curRoleName = row.roleName;
@@ -273,12 +271,11 @@ export default {
         this.$refs.tree.setCheckedKeys(checkedKeys);
       });
     },
-    // 编辑权限设置
     async handlePermissionSubmit() {
-      let nodes = this.$refs.tree.getCheckedNodes(); // getCheckedNodes 返回目前被选中节点组成的数组
-      let halfKeys = this.$refs.tree.getHalfCheckedKeys(); // 返回半选中的节点的 key 所组成的数组
-      let checkedKeys = []; // 选中的按钮
-      let parentKeys = []; // 选中的菜单
+      let nodes = this.$refs.tree.getCheckedNodes();
+      let halfKeys = this.$refs.tree.getHalfCheckedKeys();
+      let checkedKeys = [];
+      let parentKeys = [];
       nodes.map((node) => {
         if (!node.children) {
           checkedKeys.push(node._id);
@@ -287,21 +284,16 @@ export default {
         }
       });
       let params = {
-        _id: this.curRoleId, // 当前行id
+        _id: this.curRoleId,
         permissionList: {
-          checkedKeys, // 选中的子菜单
-          halfCheckedKeys: parentKeys.concat(halfKeys), // 半选中的父菜单(parentKeys 用户管理，halfKeys 系统管理 )
+          checkedKeys,
+          halfCheckedKeys: parentKeys.concat(halfKeys),
         },
       };
       await this.$api.updatePermission(params);
       this.showPermission = false;
       this.$message.success("设置成功");
       this.getRoleList();
-    },
-    // 关闭弹框
-    handleClose() {
-      this.handleReset("dialogForm");
-      this.showModal = false;
     },
     getActionMap(list) {
       let actionMap = {};
@@ -322,4 +314,6 @@ export default {
   },
 };
 </script>
-<style lang="scss"></style>
+
+<style lang="scss">
+</style>

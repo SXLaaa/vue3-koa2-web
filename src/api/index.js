@@ -4,7 +4,7 @@
  * @Autor: 史小雷
  * @Date: 2021-08-15 16:02:02
  * @LastEditors: shiXl
- * @LastEditTime: 2022-02-10 10:48:30
+ * @LastEditTime: 2022-04-10 10:56:44
  */
 /**
  * api管理
@@ -161,5 +161,14 @@ export default {
       data: params,
       mock: false,
     });
-  }
+  },
+  leaveApprove(params){
+    // 休假审核
+    return request({
+     url: "/leave/approve",
+     method: "post",
+     data: params,
+     mock: false,
+   });
+ }
 };

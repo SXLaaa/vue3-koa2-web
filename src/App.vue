@@ -4,7 +4,7 @@
  * @Autor: shiXl
  * @Date: 2021-08-08 17:09:50
  * @LastEditors: shiXl
- * @LastEditTime: 2022-02-08 13:44:34
+ * @LastEditTime: 2022-02-10 14:20:18
 -->
 <template>
   <router-view></router-view>
@@ -14,6 +14,8 @@
 export default {
   name: "app",
   mounted() {
+    let userInfo = this.$storage.getItem('userInfo');
+    if(!userInfo)this.$router.push('/login');
     setTimeout(() => {
       window.L2Dwidget.init({
         pluginRootPath: "live2dw/",
