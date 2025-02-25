@@ -42,7 +42,7 @@ export default {
     this.socket = new WebSocket("ws://localhost:3001");
 
     this.socket.onopen = () => {
-      console.log("Connected to WebSocket server");
+      console.log("WebSocket server连接");
     };
 
     this.socket.onmessage = (event) => {
@@ -52,7 +52,7 @@ export default {
     };
 
     this.socket.onclose = () => {
-      console.log("Disconnected from WebSocket server");
+      console.log("WebSocket server关闭");
     };
   },
   methods: {
