@@ -100,7 +100,7 @@ async function loadAsyncRoutes() {
         route.component = concatModules[url];
         router.addRoute("home", route);
       });
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 loadAsyncRoutes();
@@ -119,7 +119,7 @@ function checkPermission(path) {
 // 假设我们有以下白名单路由名称或路径
 
 router.beforeEach(async (to, from, next) => {
-  console.log(ROUTE_WHITELIST, 'ROUTE_WHITELIST')
+  console.log(ROUTE_WHITELIST, "ROUTE_WHITELIST");
   if (ROUTE_WHITELIST.includes(to.path)) {
     document.title = to.meta.title;
     next();
