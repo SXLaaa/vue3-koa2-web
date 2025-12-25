@@ -16,12 +16,16 @@ yarn 1.22.19
 谷歌 98 以上
 
 # 安装依赖（MAC、Windows 切换需删除 yarn.lock）
+
 ## 更换依赖安装源
+
 npm config set registry https://registry.npmjs.org/
 npm config set registry https://registry.npm.taobao.org
+
 ## 清空缓存
- yarn cache clean
- npm cache clean
+
+yarn cache clean
+npm cache clean
 
 yarn/npm
 
@@ -40,3 +44,10 @@ npm run dev
 http://localhost:8080/#/three/cesium/cesiumLayer
 http://localhost:8080/#/three/cesium/SplitScreenCesium
 http://localhost:8080/#/three/mapBox/mapBoxLayer
+
+###
+
+查看进程
+netstat -ano | findstr :3001
+杀死进程
+taskkill /F /PID 32468
