@@ -10,11 +10,13 @@
     "@element-plus/icons-vue": "^2.0.4",
     "axios": "^1.4.0",
     "cesium": "^1.116.0",
+    "echarts": "^6.0.0",
     "element-plus": "^1.0.2-beta.32",
     "mapbox-gl": "^3.4.0",
     "turf": "^3.0.14",
     "vite": "^2.9.12",
     "vue": "^3.3.4",
+    "vue-echarts": "^8.0.1",
     "vue-router": "^4.2.0",
     "vuex": "^4.1.0"
   },

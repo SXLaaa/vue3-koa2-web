@@ -2,7 +2,7 @@
  * @Author: shixl shixl@dist.com.cn
  * @Date: 2024-06-26 10:11:51
  * @LastEditors: shixiaolei
- * @LastEditTime: 2025-02-19 17:35:35
+ * @LastEditTime: 2026-01-14 09:37:43
  * @FilePath: /vue3.0-koa2/vue3-koa2-web/src/router/index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -55,6 +55,14 @@ const routes = [
         },
         component: () => import("@/components/OtherFunction/deepSeek.vue"),
       },
+      {
+        name: "PowerChart",
+        path: "/PowerChart",
+        meta: {
+          title: "PowerChart",
+        },
+        component: () => import("@/components/OtherFunction/PowerChart.vue"),
+      },
     ],
   },
   {
@@ -100,7 +108,7 @@ async function loadAsyncRoutes() {
         route.component = concatModules[url];
         router.addRoute("home", route);
       });
-    } catch (error) {}
+    } catch (error) { }
   }
 }
 loadAsyncRoutes();
