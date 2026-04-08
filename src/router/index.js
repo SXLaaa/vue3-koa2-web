@@ -63,6 +63,16 @@ const routes = [
         },
         component: () => import("@/components/OtherFunction/PowerChart.vue"),
       },
+      {
+        name: "DandelionPretext",
+        path: "/DandelionPretext",
+        alias: "/other-function/dandelion-pretext",
+        meta: {
+          title: "动态蒲公英页面",
+        },
+        component: () =>
+          import("@/components/OtherFunction/DandelionPretext.vue"),
+      },
     ],
   },
   {
