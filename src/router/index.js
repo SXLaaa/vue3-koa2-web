@@ -118,10 +118,12 @@ async function loadAsyncRoutes() {
         route.component = concatModules[url];
         router.addRoute("home", route);
       });
-    } catch (error) { }
+    } catch (error) {
+      // token 失效时清理本地登录态，避免登录页反复触发权限接口报错提示
+      storage.clearItem("userInfo");
+    }
   }
 }
-loadAsyncRoutes();
 // 判断当前地址是否可以访问
 /*
 function checkPermission(path) {

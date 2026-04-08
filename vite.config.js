@@ -1,8 +1,8 @@
 /*
- * @FilePath: /vue3-koa2-web/vite.config.js
+ * @FilePath: /vue3.0-koa2/vue3-koa2-web/vite.config.js
  * @Author: shixiaolei
  * @Date: 2024-06-26 10:11:51
- * @LastEditTime: 2024-07-11 20:33:29
+ * @LastEditTime: 2026-04-08 16:30:11
  * @LastEditors: shixiaolei
  * @Description: 
  */
@@ -35,7 +35,13 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2020', // 支持 BigInt
+    },
+  },
   build: {
+    target: 'chrome100', // 升级支持 BigInt 的环境
     rollupOptions: {
       // 告知 Rollup 不要尝试打包这些外部文件
       // 在这里配置 external，告诉 Vite 如何处理外部资源

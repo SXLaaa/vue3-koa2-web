@@ -22,7 +22,7 @@
           </div>
           <div class="metric-card">
             <span class="metric-label">当前模式</span>
-            <strong class="metric-value neutral">WebSocket 实时会话</strong>
+            <strong class="metric-value neutral">{{ currentModeText }}</strong>
           </div>
         </div>
       </section>
@@ -63,8 +63,8 @@
             </div>
             <div class="message-bubble">
               <div class="message-meta">
-                <span>{{ message.role === "user" ? "我" : "DeepSeek" }}</span>
-                <span>{{ formatTime() }}</span>
+                <span>{{ message.role === "user" ? "我" : getAssistantLabel(message) }}</span>
+                <span>{{ message.time || formatTime() }}</span>
               </div>
               <p>{{ message.content }}</p>
             </div>
@@ -74,7 +74,7 @@
             <div class="message-avatar">AI</div>
             <div class="message-bubble loading-bubble">
               <div class="message-meta">
-                <span>DeepSeek</span>
+                <span>{{ selectedModelLabel }}</span>
                 <span>生成中</span>
               </div>
               <div class="typing-dots">
@@ -88,11 +88,27 @@
 
         <footer class="chat-editor">
           <div class="editor-frame">
+            <div class="editor-toolbar">
+              <label for="modelTypeSelect">模型调用类型</label>
+              <select
+                id="modelTypeSelect"
+                v-model="selectedModelType"
+                :disabled="isLoading"
+              >
+                <option
+                  v-for="item in modelOptions"
+                  :key="item.value"
+                  :value="item.value"
+                >
+                  {{ item.label }}
+                </option>
+              </select>
+            </div>
             <textarea
               v-model="inputMessage"
               rows="3"
               maxlength="2000"
-              :disabled="isLoading || connectionStatus !== 'connected'"
+              :disabled="isLoading || !canSendByCurrentModel"
               placeholder="输入你的问题，例如：帮我优化这个 Vue 页面结构"
               @keydown.enter.exact.prevent="sendMessage"
             />
@@ -108,7 +124,7 @@
             :disabled="
               isLoading ||
               !inputMessage.trim() ||
-              connectionStatus !== 'connected'
+              !canSendByCurrentModel
             "
             @click="sendMessage"
           >
@@ -131,6 +147,10 @@ export default {
       socket: null,
       isLoading: false,
       connectionStatus: "connecting",
+      selectedModelType: "deepseek",
+      modelOptions: [
+        { label: "DeepSeek（WebSocket）", value: "deepseek" },
+      ],
       suggestions: [
         "帮我总结这个模块的功能",
         "把这段文案改得更专业一些",
@@ -139,6 +159,21 @@ export default {
     };
   },
   computed: {
+    selectedModelLabel() {
+      const labelMap = {
+        deepseek: "DeepSeek",
+      };
+      return labelMap[this.selectedModelType] || "AI";
+    },
+    currentModeText() {
+      const modeMap = {
+        deepseek: "DeepSeek（WebSocket 实时会话）",
+      };
+      return modeMap[this.selectedModelType] || "WebSocket 实时会话";
+    },
+    effectiveConnectionStatus() {
+      return this.connectionStatus;
+    },
     statusText() {
       const statusMap = {
         connecting: "连接中",
@@ -146,7 +181,10 @@ export default {
         disconnected: "已断开",
         error: "连接异常",
       };
-      return statusMap[this.connectionStatus] || "未知状态";
+      return statusMap[this.effectiveConnectionStatus] || "未知状态";
+    },
+    canSendByCurrentModel() {
+      return this.connectionStatus === "connected";
     },
   },
   mounted() {
@@ -154,6 +192,13 @@ export default {
   },
   methods: {
     initSocket() {
+      if (
+        this.socket &&
+        [WebSocket.OPEN, WebSocket.CONNECTING].includes(this.socket.readyState)
+      ) {
+        return;
+      }
+
       this.connectionStatus = "connecting";
       this.socket = new WebSocket(config.getWsUrl());
 
@@ -163,6 +208,8 @@ export default {
 
       this.socket.onmessage = (event) => {
         const response = JSON.parse(event.data);
+        response.providerLabel = this.getProviderLabel(response);
+        response.time = this.formatTime();
         this.messages.push(response);
         this.isLoading = false;
         this.scrollToBottom();
@@ -178,18 +225,25 @@ export default {
         this.isLoading = false;
       };
     },
-    sendMessage() {
+    async sendMessage() {
       if (
         !this.inputMessage.trim() ||
-        !this.socket ||
-        this.socket.readyState !== WebSocket.OPEN
+        this.isLoading
       ) {
+        return;
+      }
+
+      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        this.initSocket();
         return;
       }
 
       const userMessage = {
         role: "user",
         content: this.inputMessage.trim(),
+        modelType: this.selectedModelType,
+        providerLabel: this.selectedModelLabel,
+        time: this.formatTime(),
       };
 
       this.messages.push(userMessage);
@@ -197,6 +251,18 @@ export default {
       this.inputMessage = "";
       this.isLoading = true;
       this.scrollToBottom();
+    },
+    getProviderLabel(message) {
+      const modelType = message?.modelType || this.selectedModelType;
+      const providerLabelMap = {
+        deepseek: "DeepSeek",
+        tongyi: "通义千问",
+        system: "系统消息",
+      };
+      return providerLabelMap[modelType] || "AI";
+    },
+    getAssistantLabel(message) {
+      return message.providerLabel || this.getProviderLabel(message);
     },
     applySuggestion(text) {
       this.inputMessage = text;
@@ -572,6 +638,31 @@ export default {
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: linear-gradient(180deg, #ffffff, #f8fafc);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #607180;
+}
+
+.editor-toolbar select {
+  min-width: 196px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 12px;
+  padding: 6px 10px;
+  background: #fff;
+  color: #1f3347;
+  outline: none;
+}
+
+.editor-toolbar select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .editor-frame textarea {
