@@ -23,6 +23,16 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3000",
       },
+      "/ws": {
+        target: "ws://localhost:3000",
+        ws: true,
+      },
+      "/modelData": {
+        target: "http://localhost:8089",
+      },
+      "/geoserver": {
+        target: "http://localhost:8089",
+      },
     },
   },
   build: {

@@ -57,6 +57,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import ResourceManager from "@/utils/ResourceManager.js";
+import config from "@/config";
 export default {
   setup() {
     const activeIndex = ref("");
@@ -115,8 +116,7 @@ export default {
           {
             id: "37005_sd",
             title: "海岛",
-            layerUrl:
-              "http://localhost:8089/modelData/landTiles/tileset_whole.json",
+            layerUrl: config.getModelUrl("landTiles/tileset_whole.json"),
             layerName: "海岛",
             platForm: "model",
             layerType: "3dTiles",
@@ -127,7 +127,7 @@ export default {
           {
             id: "37006_sd",
             title: "建筑",
-            layerUrl: "http://localhost:8089/modelData/houseTiles/tileset.json",
+            layerUrl: config.getModelUrl("houseTiles/tileset.json"),
             layerName: "建筑",
             platForm: "model",
             layerType: "3dTiles",
@@ -143,7 +143,7 @@ export default {
           {
             id: "37007_sd",
             title: "济南wms服务",
-            layerUrl: "http://localhost:8089/geoserver/cite/wms",
+            layerUrl: config.getGeoserverUrl("cite/wms"),
             layerName: "cite:jinan",
             platForm: "ogc",
             layerType: "wms",
@@ -154,7 +154,7 @@ export default {
           {
             id: "37008_sd",
             title: "蓬莱水城wms",
-            layerUrl: "http://localhost:8089/geoserver/cite/wms",
+            layerUrl: config.getGeoserverUrl("cite/wms"),
             layerName: "cite:penglaiwater",
             platForm: "ogc",
             layerType: "wms",
@@ -165,7 +165,7 @@ export default {
             id: "37009_sd",
             title: "济南wmts4326",
             layerUrl:
-              "http://localhost:8089/geoserver/gwc/service/wmts/rest/jinan:jinan4326/{style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}?format=image/png",
+              `${config.getGeoserverUrl("gwc/service/wmts/rest/jinan:jinan4326")}/{style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}?format=image/png`,
             layerName: "jinan:jinan4326",
             platForm: "ogc",
             layerType: "wmts",
@@ -176,7 +176,7 @@ export default {
             id: "370010_sd",
             title: "济南wmts3857",
             layerUrl:
-              "http://localhost:8089/geoserver/gwc/service/wmts/rest/jinan:jinan3857/{style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}?format=image/png",
+              `${config.getGeoserverUrl("gwc/service/wmts/rest/jinan:jinan3857")}/{style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}?format=image/png`,
             layerName: "jinan:jinan3857",
             platForm: "ogc",
             layerType: "wmts",
@@ -186,9 +186,9 @@ export default {
           {
             id: "370011_sd",
             title: "青岛WFS行政区划",
-            layerUrl: "http://localhost:8089/geoserver/qingdao/ows",
+            layerUrl: config.getGeoserverUrl("qingdao/ows"),
             // layerUrl:
-            //   "http://localhost:8089/geoserver/qingdao/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=qingdao%3A370200-polygon&maxFeatures=50",
+            //   `${config.getGeoserverUrl("qingdao/ows")}?service=WFS&version=1.0.0&request=GetFeature&typeName=qingdao%3A370200-polygon&maxFeatures=50`,
             layerName: "qingdao:370200-polygon",
             platForm: "ogc",
             layerType: "wfs",

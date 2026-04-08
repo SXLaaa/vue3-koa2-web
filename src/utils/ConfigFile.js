@@ -2,7 +2,7 @@
  * @FilePath: /vue3.0-koa2/vue3-koa2-web/src/utils/ConfigFile.js
  * @Author: shixiaolei
  * @Date: 2024-06-26 10:11:51
- * @LastEditTime: 2026-01-14 09:38:35
+ * @LastEditTime: 2026-04-08 10:14:24
  * @LastEditors: shixiaolei
  * @Description: 
  */
@@ -11,7 +11,8 @@ export const ROUTE_WHITELIST = [
   "/three/cesium/cesiumLayer",
   "/three/mapBox/mapBoxLayer",
   "/deepSeek",
-  "/PowerChart"
+  "/PowerChart",
+  "/DandelionPretext",
 ];
 export const ininCoordinates = {
   longitude: 117.0, // 替换为具体的目标经纬度

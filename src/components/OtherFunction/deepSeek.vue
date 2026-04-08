@@ -1,76 +1,222 @@
 <template>
-  <div class="chat-container">
-    <div class="chat-messages">
-      <div
-        v-for="(message, index) in messages"
-        :key="index"
-        :class="message.role === 'user' ? 'user-message' : 'bot-message'"
-      >
-        <p>{{ message.content }}</p>
-      </div>
-      <!-- 加载提示 -->
-      <div v-if="isLoading" class="loading-message">
-        <p>正在等待 AI 回复，请稍候...</p>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input
-        v-model="inputMessage"
-        @keyup.enter="sendMessage"
-        placeholder="输入消息"
-        :disabled="isLoading"
-      />
-      <button @click="sendMessage" :disabled="isLoading">
-        {{ isLoading ? "正在发送..." : "发送" }}
-      </button>
+  <div class="deepseek-page">
+    <div class="deepseek-shell">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <span class="hero-badge">DeepSeek Workspace</span>
+          <h1>更清晰的 AI 对话界面</h1>
+          <p>
+            保留现有 WebSocket 交互方式，优化消息层次、等待状态和输入区域，让对话页更像一个正式产品页面。
+          </p>
+        </div>
+        <div class="hero-metrics">
+          <div class="metric-card">
+            <span class="metric-label">连接状态</span>
+            <strong :class="['metric-value', connectionStatus]">
+              {{ statusText }}
+            </strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">消息总数</span>
+            <strong class="metric-value neutral">{{ messages.length }}</strong>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">当前模式</span>
+            <strong class="metric-value neutral">WebSocket 实时会话</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="chat-card">
+        <header class="chat-header">
+          <div>
+            <h2>智能问答</h2>
+            <p>输入问题后回车或点击发送，消息会实时追加到会话流中。</p>
+          </div>
+          <span :class="['status-pill', connectionStatus]">{{ statusText }}</span>
+        </header>
+
+        <div ref="messageListRef" class="chat-messages">
+          <div v-if="!messages.length && !isLoading" class="empty-state">
+            <div class="empty-icon">DS</div>
+            <h3>开始一次新对话</h3>
+            <p>可以先试试需求拆解、代码解释、页面文案优化或接口设计问题。</p>
+            <div class="suggestion-list">
+              <button
+                v-for="item in suggestions"
+                :key="item"
+                class="suggestion-chip"
+                @click="applySuggestion(item)"
+              >
+                {{ item }}
+              </button>
+            </div>
+          </div>
+
+          <article
+            v-for="(message, index) in messages"
+            :key="index"
+            :class="['message-row', message.role === 'user' ? 'is-user' : 'is-bot']"
+          >
+            <div class="message-avatar">
+              {{ message.role === "user" ? "我" : "AI" }}
+            </div>
+            <div class="message-bubble">
+              <div class="message-meta">
+                <span>{{ message.role === "user" ? "我" : "DeepSeek" }}</span>
+                <span>{{ formatTime() }}</span>
+              </div>
+              <p>{{ message.content }}</p>
+            </div>
+          </article>
+
+          <article v-if="isLoading" class="message-row is-bot">
+            <div class="message-avatar">AI</div>
+            <div class="message-bubble loading-bubble">
+              <div class="message-meta">
+                <span>DeepSeek</span>
+                <span>生成中</span>
+              </div>
+              <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <footer class="chat-editor">
+          <div class="editor-frame">
+            <textarea
+              v-model="inputMessage"
+              rows="3"
+              maxlength="2000"
+              :disabled="isLoading || connectionStatus !== 'connected'"
+              placeholder="输入你的问题，例如：帮我优化这个 Vue 页面结构"
+              @keydown.enter.exact.prevent="sendMessage"
+            />
+            <div class="editor-bar">
+              <span class="editor-tip">
+                Enter 发送，Shift + Enter 换行
+              </span>
+              <span class="editor-count">{{ inputMessage.length }}/2000</span>
+            </div>
+          </div>
+          <button
+            class="send-button"
+            :disabled="
+              isLoading ||
+              !inputMessage.trim() ||
+              connectionStatus !== 'connected'
+            "
+            @click="sendMessage"
+          >
+            {{ isLoading ? "发送中..." : "发送消息" }}
+          </button>
+        </footer>
+      </section>
     </div>
   </div>
 </template>
 
 <script>
+import config from "@/config";
+
 export default {
   data() {
     return {
       messages: [],
       inputMessage: "",
       socket: null,
-      isLoading: false, // 新增加载状态
+      isLoading: false,
+      connectionStatus: "connecting",
+      suggestions: [
+        "帮我总结这个模块的功能",
+        "把这段文案改得更专业一些",
+        "给我一个 Vue 页面优化建议",
+      ],
     };
+  },
+  computed: {
+    statusText() {
+      const statusMap = {
+        connecting: "连接中",
+        connected: "已连接",
+        disconnected: "已断开",
+        error: "连接异常",
+      };
+      return statusMap[this.connectionStatus] || "未知状态";
+    },
   },
   mounted() {
-    // 建立WebSocket连接
-    this.socket = new WebSocket("ws://localhost:3001");
-
-    this.socket.onopen = () => {
-      console.log("WebSocket server连接");
-    };
-
-    this.socket.onmessage = (event) => {
-      const response = JSON.parse(event.data);
-      this.messages.push(response);
-      this.isLoading = false; // 收到消息后，取消加载状态
-    };
-
-    this.socket.onclose = () => {
-      console.log("WebSocket server关闭");
-    };
+    this.initSocket();
   },
   methods: {
+    initSocket() {
+      this.connectionStatus = "connecting";
+      this.socket = new WebSocket(config.getWsUrl());
+
+      this.socket.onopen = () => {
+        this.connectionStatus = "connected";
+      };
+
+      this.socket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        this.messages.push(response);
+        this.isLoading = false;
+        this.scrollToBottom();
+      };
+
+      this.socket.onerror = () => {
+        this.connectionStatus = "error";
+        this.isLoading = false;
+      };
+
+      this.socket.onclose = () => {
+        this.connectionStatus = "disconnected";
+        this.isLoading = false;
+      };
+    },
     sendMessage() {
-      if (this.inputMessage.trim() === "") return;
+      if (
+        !this.inputMessage.trim() ||
+        !this.socket ||
+        this.socket.readyState !== WebSocket.OPEN
+      ) {
+        return;
+      }
 
       const userMessage = {
         role: "user",
-        content: this.inputMessage,
+        content: this.inputMessage.trim(),
       };
+
       this.messages.push(userMessage);
       this.socket.send(JSON.stringify(userMessage));
       this.inputMessage = "";
-      this.isLoading = true; // 发送消息后，开启加载状态
+      this.isLoading = true;
+      this.scrollToBottom();
+    },
+    applySuggestion(text) {
+      this.inputMessage = text;
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const el = this.$refs.messageListRef;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
+      });
+    },
+    formatTime() {
+      return new Date().toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
-  beforeDestroy() {
-    // 关闭WebSocket连接
+  beforeUnmount() {
     if (this.socket) {
       this.socket.close();
     }
@@ -79,96 +225,471 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$primary-color: #007bff;
-$secondary-color: #0056b3;
-$background-color: #f9f9f9;
-$shadow-color: rgba(0, 0, 0, 0.1);
-$border-radius: 15px;
-$input-padding: 10px;
-$button-padding: 10px 20px;
+.deepseek-page {
+  height: 100%;
+  min-height: 0;
+  padding: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.2), transparent 30%),
+    radial-gradient(circle at right center, rgba(245, 158, 11, 0.16), transparent 24%),
+    linear-gradient(135deg, #eef6f4 0%, #f8fbfa 48%, #f3efe7 100%);
+}
 
-.chat-container {
+.deepseek-shell {
+  max-width: 1240px;
+  height: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.hero-panel,
+.chat-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.hero-panel {
+  min-height: 0;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  height: 450px;
-  max-width: 600px;
-  margin: 20px auto;
-  border: 1px solid #ccc;
-  border-radius: $border-radius;
-  overflow: hidden;
-  background-color: $background-color;
-  box-shadow: 0 4px 10px $shadow-color;
+  justify-content: space-between;
+  gap: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 249, 247, 0.94)),
+    linear-gradient(135deg, #fef7ed, #ecfeff);
+}
 
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    background-color: #f3f3f3;
+.hero-copy h1 {
+  margin: 14px 0 12px;
+  font-size: 34px;
+  line-height: 1.15;
+  color: #132238;
+}
+
+.hero-copy p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #48606f;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-metrics {
+  display: grid;
+  gap: 14px;
+}
+
+.metric-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.metric-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6b7a89;
+}
+
+.metric-value {
+  font-size: 20px;
+  color: #132238;
+}
+
+.metric-value.connected {
+  color: #0f766e;
+}
+
+.metric-value.connecting {
+  color: #b45309;
+}
+
+.metric-value.disconnected,
+.metric-value.error {
+  color: #b42318;
+}
+
+.metric-value.neutral {
+  color: #132238;
+}
+
+.chat-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 28px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.chat-header h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  color: #132238;
+}
+
+.chat-header p {
+  margin: 0;
+  color: #607180;
+  font-size: 14px;
+}
+
+.status-pill {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-pill.connected {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.status-pill.connecting {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+
+.status-pill.disconnected,
+.status-pill.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b42318;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  padding: 22px 28px;
+  overflow-y: auto;
+  background:
+    linear-gradient(180deg, rgba(247, 250, 252, 0.8), rgba(255, 255, 255, 0.95)),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 35px,
+      rgba(15, 23, 42, 0.018) 35px,
+      rgba(15, 23, 42, 0.018) 36px
+    );
+}
+
+.empty-state {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.empty-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #0f766e, #f59e0b);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 18px 40px rgba(15, 118, 110, 0.26);
+}
+
+.empty-state h3 {
+  margin: 18px 0 10px;
+  font-size: 24px;
+  color: #132238;
+}
+
+.empty-state p {
+  max-width: 520px;
+  margin: 0;
+  color: #607180;
+  line-height: 1.8;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.suggestion-chip {
+  padding: 10px 16px;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f4c5c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestion-chip:hover {
+  transform: translateY(-1px);
+  background: #fff7ed;
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.message-row.is-user {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #134e4a, #0f766e);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.2);
+}
+
+.message-row.is-user .message-avatar {
+  background: linear-gradient(135deg, #b45309, #f59e0b);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.24);
+}
+
+.message-bubble {
+  max-width: min(78%, 820px);
+  padding: 16px 18px;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.message-row.is-user .message-bubble {
+  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #7b8a97;
+}
+
+.message-bubble p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #1f3347;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.loading-bubble {
+  min-width: 140px;
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0f766e;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.chat-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 148px;
+  gap: 16px;
+  padding: 20px 28px 28px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.editor-frame {
+  padding: 14px 16px 12px;
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.editor-frame textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1f3347;
+}
+
+.editor-frame textarea::placeholder {
+  color: #96a3af;
+}
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #7b8a97;
+}
+
+.send-button {
+  border: none;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #115e59, #0f766e 45%, #f59e0b);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 18px 36px rgba(15, 118, 110, 0.24);
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.send-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+@keyframes pulse {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.45;
   }
 
-  .user-message,
-  .bot-message {
-    margin-bottom: 15px;
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-    p {
-      display: inline-block;
-      padding: 10px 15px;
-      border-radius: $border-radius;
-      max-width: 75%;
-      box-shadow: 0 2px 5px $shadow-color;
-    }
+@media (max-width: 1100px) {
+  .deepseek-shell {
+    grid-template-columns: 1fr;
   }
 
-  .user-message {
-    text-align: right;
-
-    p {
-      background-color: #d3f8c6;
-    }
+  .deepseek-page {
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
   }
 
-  .bot-message {
-    text-align: left;
+  .chat-card {
+    min-height: 680px;
+  }
+}
 
-    p {
-      background-color: #ffffff;
-    }
+@media (max-width: 768px) {
+  .deepseek-page {
+    height: 100%;
+    min-height: 0;
+    padding: 16px;
+    overflow: auto;
   }
 
-  .chat-input {
-    display: flex;
-    padding: 15px;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-
-    input {
-      flex: 1;
-      padding: $input-padding;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      margin-right: 15px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: $button-padding;
-      background-color: $primary-color;
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 16px;
-
-      &:hover {
-        background-color: $secondary-color;
-      }
-    }
+  .hero-panel,
+  .chat-card {
+    border-radius: 22px;
   }
 
-  .loading-message {
-    text-align: center;
-    color: #888;
-    font-style: italic;
+  .hero-copy h1 {
+    font-size: 28px;
+  }
+
+  .chat-header,
+  .chat-messages,
+  .chat-editor {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .message-bubble {
+    max-width: 100%;
+  }
+
+  .chat-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .send-button {
+    min-height: 52px;
   }
 }
 </style>
