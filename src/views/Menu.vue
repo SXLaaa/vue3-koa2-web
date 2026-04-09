@@ -243,7 +243,7 @@ export default {
       if (type == 2) {
         // 行内新增
         this.menuForm.parentId = [...row.parentId, row._id].filter(
-          (item) => item
+          (item) => item,
         ); // 判读只有item不为null的时候再拼接
       }
     },
@@ -265,7 +265,11 @@ export default {
       this.$refs.dialogForm.validate(async (valid) => {
         if (valid) {
           let { action, menuForm } = this;
-          let params = { ...menuForm, action };
+          let params = {
+            ...menuForm,
+            parentId: menuForm.parentId?.filter(Boolean) || [], // 过滤掉 null
+            action,
+          };
           let res = await this.$api.menuSubmit(params);
           this.showModal = false;
           this.$message.success("操作成功");

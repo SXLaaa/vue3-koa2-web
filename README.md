@@ -32,6 +32,8 @@ yarn/npm
 # cesium 依赖引入切换
 
 index.html
+
+路径：vue3-koa2-web\public
 windows Cesium
 Mac Cesium-Mac
 
@@ -39,12 +41,17 @@ Mac Cesium-Mac
 
 npm run dev
 
+注意：如运行失败，需要删除依赖重新下载；用npm run dev 和 yarn dev各自试试；
+管理员/123456
+
 # 白名单访问三维
+
 http://localhost:8080/#/three/cesium/cesiumLayer
 http://localhost:8080/#/three/cesium/SplitScreenCesium
 http://localhost:8080/#/three/mapBox/mapBoxLayer
 
 # 白名单访问deepseek
+
 http://localhost:8080/#/deepSeek
 
 ###
@@ -52,21 +59,21 @@ http://localhost:8080/#/deepSeek
 ## Docker 外网部署说明
 
 - 本地开发保持不变：
-`/api -> http://localhost:3000`
-`/ws -> 通过 Vite 代理到 ws://localhost:3000`
-`/modelData`、`/geoserver -> http://localhost:8089`
+  `/api -> http://localhost:3000`
+  `/ws -> 通过 Vite 代理到 ws://localhost:3000`
+  `/modelData`、`/geoserver -> http://localhost:8089`
 
 - 生产环境会自动切到同域名相对路径：
-`/api`
-`/ws`
-`/modelData`
-`/geoserver`
+  `/api`
+  `/ws`
+  `/modelData`
+  `/geoserver`
 
 - 因此前端部署到 Docker 后，不要再把接口地址写成 `localhost`。
 
 - `nginx.conf` 已预留以下反向代理，要求后端容器内这些服务可访问：
-`webserver:3000` API / WebSocket
-`webserver:8089` modelData / geoserver
+  `webserver:3000` API / WebSocket
+  `webserver:8089` modelData / geoserver
 
 - 如果你的后端容器名不是 `webserver`，请同步修改 `nginx.conf` 里的 `proxy_pass`。
 
@@ -99,8 +106,8 @@ AI 密钥配置：
 - 后端已不再在代码里保存明文密钥
 - 参考 `vue3-koa2-server/.env.example`
 - 本地运行时请自行注入：
-`DEEPSEEK_API_KEY`
-`DASHSCOPE_API_KEY`
+  `DEEPSEEK_API_KEY`
+  `DASHSCOPE_API_KEY`
 - Docker Compose 会自动透传宿主机环境变量中的这两个值
 
 说明：
