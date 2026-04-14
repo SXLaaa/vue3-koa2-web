@@ -8,6 +8,9 @@
           <p>
             保留现有 WebSocket 交互方式，优化消息层次、等待状态和输入区域，让对话页更像一个正式产品页面。
           </p>
+          <button class="plan-entry" @click="openLearningPlan">
+            查看 AI 学习计划
+          </button>
         </div>
         <div class="hero-metrics">
           <div class="metric-card">
@@ -133,6 +136,35 @@
         </footer>
       </section>
     </div>
+
+    <div
+      v-if="showLearningPlan"
+      class="plan-overlay"
+      @click.self="closeLearningPlan"
+    >
+      <section class="plan-modal">
+        <header class="plan-header">
+          <div>
+            <h3>前端工程师 AI 学习练习计划</h3>
+            <p>基于当前 DeepSeek 页面，按 6 周循序渐进练习。</p>
+          </div>
+          <button class="plan-close" @click="closeLearningPlan">关闭</button>
+        </header>
+        <div class="plan-content">
+          <article
+            v-for="item in learningPlan"
+            :key="item.week"
+            class="plan-item"
+          >
+            <h4>{{ item.week }}：{{ item.title }}</h4>
+            <p class="plan-goal">{{ item.goal }}</p>
+            <ul>
+              <li v-for="task in item.tasks" :key="task">{{ task }}</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -150,11 +182,75 @@ export default {
       selectedModelType: "deepseek",
       modelOptions: [
         { label: "DeepSeek（WebSocket）", value: "deepseek" },
+        { label: "GPT Plus（OpenAI）", value: "openai" },
       ],
       suggestions: [
         "帮我总结这个模块的功能",
         "把这段文案改得更专业一些",
         "给我一个 Vue 页面优化建议",
+      ],
+      showLearningPlan: false,
+      learningPlan: [
+        {
+          week: "第1周",
+          title: "吃透现有对话页",
+          goal: "搞清楚连接状态、发送流程和消息渲染链路。",
+          tasks: [
+            "画出连接状态机（connecting/connected/disconnected/error）",
+            "把 sendMessage 与 initSocket 逐行注释并写成文档",
+            "做一次断网与重连场景的手工测试",
+          ],
+        },
+        {
+          week: "第2周",
+          title: "重构成可复用能力",
+          goal: "把页面逻辑抽到组合式函数，提升复用性。",
+          tasks: [
+            "抽离 useChatSocket 管理连接、发送、重连",
+            "封装消息结构（role/content/time/providerLabel）",
+            "给输入区加发送防抖和空消息保护",
+          ],
+        },
+        {
+          week: "第3周",
+          title: "实现流式输出体验",
+          goal: "做到 token 级流式渲染，而不是整段返回。",
+          tasks: [
+            "后端改为分片推送，前端按 messageId 逐步拼接",
+            "加入“停止生成”与“重新回答”按钮",
+            "优化滚动体验，保持首屏可读性",
+          ],
+        },
+        {
+          week: "第4周",
+          title: "会话管理与持久化",
+          goal: "支持多会话切换和历史记录回看。",
+          tasks: [
+            "实现会话列表（新建、重命名、删除）",
+            "使用 localStorage 或 IndexedDB 持久化历史",
+            "页面刷新后恢复最近会话",
+          ],
+        },
+        {
+          week: "第5周",
+          title: "稳定性与安全",
+          goal: "完善错误处理、重试策略和密钥安全。",
+          tasks: [
+            "区分网络错误、服务错误、模型错误并提示",
+            "增加重试按钮与指数退避重连",
+            "改为服务端代理模型调用，前端不暴露密钥",
+          ],
+        },
+        {
+          week: "第6周",
+          title: "作品化交付",
+          goal: "形成一个可演示、可复盘的 AI 前端项目。",
+          tasks: [
+            "补全 README：架构图、状态流、关键取舍",
+            "记录性能指标：首字时间、失败率、重试成功率",
+            "完成 3 分钟演示录屏并整理下一步迭代路线",
+          ],
+        },
       ],
     };
   },
@@ -162,12 +258,14 @@ export default {
     selectedModelLabel() {
       const labelMap = {
         deepseek: "DeepSeek",
+        openai: "GPT Plus",
       };
       return labelMap[this.selectedModelType] || "AI";
     },
     currentModeText() {
       const modeMap = {
         deepseek: "DeepSeek（WebSocket 实时会话）",
+        openai: "GPT Plus（OpenAI Chat Completions）",
       };
       return modeMap[this.selectedModelType] || "WebSocket 实时会话";
     },
@@ -256,6 +354,7 @@ export default {
       const modelType = message?.modelType || this.selectedModelType;
       const providerLabelMap = {
         deepseek: "DeepSeek",
+        openai: "GPT Plus",
         tongyi: "通义千问",
         system: "系统消息",
       };
@@ -280,6 +379,12 @@ export default {
         hour: "2-digit",
         minute: "2-digit",
       });
+    },
+    openLearningPlan() {
+      this.showLearningPlan = true;
+    },
+    closeLearningPlan() {
+      this.showLearningPlan = false;
     },
   },
   beforeUnmount() {
@@ -347,6 +452,19 @@ export default {
   font-size: 15px;
   line-height: 1.8;
   color: #48606f;
+}
+
+.plan-entry {
+  margin-top: 16px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #0f766e, #0f4c5c);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.2);
 }
 
 .hero-badge {
@@ -712,6 +830,99 @@ export default {
   box-shadow: none;
 }
 
+.plan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.plan-modal {
+  width: min(920px, 100%);
+  max-height: min(86vh, 900px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.22);
+  overflow: hidden;
+}
+
+.plan-header {
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.plan-header h3 {
+  margin: 0 0 6px;
+  color: #132238;
+  font-size: 22px;
+}
+
+.plan-header p {
+  margin: 0;
+  color: #5f7182;
+  font-size: 14px;
+}
+
+.plan-close {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  color: #1f3347;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.plan-content {
+  padding: 18px 22px 22px;
+  overflow-y: auto;
+  display: grid;
+  gap: 14px;
+  background: linear-gradient(180deg, #f8fbfa, #ffffff);
+}
+
+.plan-item {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #ffffff;
+}
+
+.plan-item h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #15304a;
+}
+
+.plan-goal {
+  margin: 8px 0 10px;
+  color: #52667b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.plan-item ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #1f3347;
+}
+
+.plan-item li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
 @keyframes pulse {
   0%,
   80%,
@@ -781,6 +992,15 @@ export default {
 
   .send-button {
     min-height: 52px;
+  }
+
+  .plan-overlay {
+    padding: 12px;
+  }
+
+  .plan-modal {
+    max-height: 90vh;
+    border-radius: 18px;
   }
 }
 </style>

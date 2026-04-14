@@ -89,12 +89,20 @@ onMounted(() => {
 function login(formRef) {
   formRef.validate(async (valid) => {
     if (valid) {
-      let res = await proxy.$api.verifyCaptcha(user); // 验证码校验
-      if (res) {
-        api.login(user).then(async (res) => {
-          store.commit("saveUserInfo", res);
-          router.push("/welcome");
-        });
+      try {
+        let res = await proxy.$api.verifyCaptcha(user); // 验证码校验
+        if (res) {
+          api.login(user).then(async (res) => {
+            store.commit("saveUserInfo", res);
+            router.push("/welcome");
+          });
+        } else {
+          await refreshCaptcha();
+          user.captcha = "";
+        }
+      } catch (error) {
+        await refreshCaptcha();
+        user.captcha = "";
       }
     } else {
       return false;
@@ -105,7 +113,8 @@ function goHome() {
   router.push("/welcome");
 }
 async function refreshCaptcha() {
-  let res = await proxy.$api.getCaptcha();
+  // 增加时间戳参数，避免浏览器缓存导致验证码图片不更新
+  let res = await proxy.$api.getCaptcha({ t: Date.now() });
   captchaImage.value = res.trim();
 }
 </script>
