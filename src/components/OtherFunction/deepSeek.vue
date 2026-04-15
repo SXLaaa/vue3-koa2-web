@@ -205,13 +205,30 @@
 
 <script>
 import config from "@/config";
+import { useChatSocket } from "@/composables/useChatSocket";
+
+function createDebounce(fn, wait = 280) {
+  let timer = null;
+  const debounced = function (...args) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, wait);
+  };
+  debounced.cancel = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+  return debounced;
+}
 
 export default {
   data() {
     return {
       messages: [],
       inputMessage: "",
-      socket: null,
+      chatSocket: null,
+      sendMessageDebounced: null,
       isLoading: false,
       connectionStatus: "connecting",
       selectedModelType: "deepseek",
@@ -512,66 +529,102 @@ export default {
     },
   },
   mounted() {
-    this.initSocket();
+    // 页面只关注状态和消息渲染，WebSocket 细节由 composable 承担。
+    this.chatSocket = useChatSocket({
+      getUrl: () => config.getWsUrl(),
+      onStatusChange: (status) => {
+        this.connectionStatus = status;
+        if (status !== "connected") {
+          this.isLoading = false;
+        }
+      },
+      onMessage: (raw) => {
+        this.handleSocketMessage(raw);
+      },
+      onError: () => {
+        this.isLoading = false;
+      },
+    });
+    this.chatSocket.connect();
+    // 发送入口做防抖，避免用户连击按钮或重复回车触发多次请求。
+    this.sendMessageDebounced = createDebounce(this.handleSendMessage, 280);
   },
   methods: {
-    initSocket() {
-      if (
-        this.socket &&
-        [WebSocket.OPEN, WebSocket.CONNECTING].includes(this.socket.readyState)
-      ) {
-        return;
-      }
-
-      this.connectionStatus = "connecting";
-      this.socket = new WebSocket(config.getWsUrl());
-
-      this.socket.onopen = () => {
-        this.connectionStatus = "connected";
-      };
-
-      this.socket.onmessage = (event) => {
-        const response = JSON.parse(event.data);
-        response.providerLabel = this.getProviderLabel(response);
-        response.time = this.formatTime();
-        this.messages.push(response);
-        this.isLoading = false;
-        this.scrollToBottom();
-      };
-
-      this.socket.onerror = () => {
-        this.connectionStatus = "error";
-        this.isLoading = false;
-      };
-
-      this.socket.onclose = () => {
-        this.connectionStatus = "disconnected";
-        this.isLoading = false;
+    createMessage({
+      role,
+      content,
+      modelType,
+      providerLabel,
+      time,
+    }) {
+      // 统一消息结构，确保用户消息与服务端回包都按同一字段渲染。
+      return {
+        role,
+        content,
+        modelType,
+        providerLabel,
+        time: time || this.formatTime(),
       };
     },
-    async sendMessage() {
+    normalizeIncomingMessage(raw) {
+      try {
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        return this.createMessage({
+          role: parsed?.role || "assistant",
+          content: parsed?.content || "",
+          modelType: parsed?.modelType || this.selectedModelType,
+          providerLabel: this.getProviderLabel(parsed || {}),
+          time: parsed?.time || this.formatTime(),
+        });
+      } catch (error) {
+        // 避免解析异常打断页面，回落成可展示的系统消息。
+        return this.createMessage({
+          role: "assistant",
+          content: "响应解析失败，请稍后重试。",
+          modelType: "system",
+          providerLabel: "系统消息",
+        });
+      }
+    },
+    handleSocketMessage(raw) {
+      const response = this.normalizeIncomingMessage(raw);
+      this.messages.push(response);
+      this.isLoading = false;
+      this.scrollToBottom();
+    },
+    sendMessage() {
+      if (!this.sendMessageDebounced) {
+        this.handleSendMessage();
+        return;
+      }
+      // UI 层永远走防抖入口，真实发送由 handleSendMessage 统一处理。
+      this.sendMessageDebounced();
+    },
+    handleSendMessage() {
+      const content = this.inputMessage.trim();
+      if (!content || this.isLoading) return;
+
       if (
-        !this.inputMessage.trim() ||
-        this.isLoading
+        !this.chatSocket ||
+        this.chatSocket.getReadyState() !== WebSocket.OPEN
       ) {
+        this.chatSocket?.connect();
         return;
       }
 
-      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-        this.initSocket();
-        return;
-      }
-
-      const userMessage = {
+      const userMessage = this.createMessage({
         role: "user",
-        content: this.inputMessage.trim(),
+        content,
         modelType: this.selectedModelType,
         providerLabel: this.selectedModelLabel,
-        time: this.formatTime(),
-      };
+      });
 
       this.messages.push(userMessage);
-      this.socket.send(JSON.stringify(userMessage));
+      const sent = this.chatSocket.send(userMessage);
+      if (!sent) {
+        this.chatSocket.connect();
+        return;
+      }
       this.inputMessage = "";
       this.isLoading = true;
       this.scrollToBottom();
@@ -620,9 +673,8 @@ export default {
     },
   },
   beforeUnmount() {
-    if (this.socket) {
-      this.socket.close();
-    }
+    this.sendMessageDebounced?.cancel?.();
+    this.chatSocket?.close?.();
   },
 };
 </script>
