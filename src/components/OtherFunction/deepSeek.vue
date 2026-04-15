@@ -8,9 +8,14 @@
           <p>
             保留现有 WebSocket 交互方式，优化消息层次、等待状态和输入区域，让对话页更像一个正式产品页面。
           </p>
-          <button class="plan-entry" @click="openLearningPlan">
-            查看 AI 学习计划
-          </button>
+          <div class="hero-actions">
+            <button class="plan-entry" @click="openLearningPlan">
+              查看 AI 学习计划
+            </button>
+            <button class="deploy-entry" @click="openDeployGuide">
+              查看阿里云部署手册
+            </button>
+          </div>
         </div>
         <div class="hero-metrics">
           <div class="metric-card">
@@ -165,6 +170,36 @@
         </div>
       </section>
     </div>
+
+    <div
+      v-if="showDeployGuide"
+      class="plan-overlay"
+      @click.self="closeDeployGuide"
+    >
+      <section class="plan-modal">
+        <header class="plan-header">
+          <div>
+            <h3>阿里云 ECS 线上部署手册</h3>
+            <p>基于本项目实战排障记录整理，适配 Podman / Docker Compose 场景。</p>
+          </div>
+          <button class="plan-close" @click="closeDeployGuide">关闭</button>
+        </header>
+        <div class="plan-content">
+          <article
+            v-for="item in deployGuide"
+            :key="item.title"
+            class="plan-item"
+          >
+            <h4>{{ item.title }}</h4>
+            <p class="plan-goal">{{ item.goal }}</p>
+            <ul>
+              <li v-for="task in item.tasks" :key="task">{{ task }}</li>
+            </ul>
+            <pre v-if="item.commands && item.commands.length" class="guide-code"><code>{{ item.commands.join("\n") }}</code></pre>
+          </article>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -190,6 +225,7 @@ export default {
         "给我一个 Vue 页面优化建议",
       ],
       showLearningPlan: false,
+      showDeployGuide: false,
       learningPlan: [
         {
           week: "第1周",
@@ -249,6 +285,196 @@ export default {
             "补全 README：架构图、状态流、关键取舍",
             "记录性能指标：首字时间、失败率、重试成功率",
             "完成 3 分钟演示录屏并整理下一步迭代路线",
+          ],
+        },
+      ],
+      deployGuide: [
+        {
+          title: "0. 目标与目录约定",
+          goal: "统一约定部署路径与访问方式，减少误操作。",
+          tasks: [
+            "部署目录统一使用 /opt/vue3-koa2-web 与 /opt/vue3-koa2-server。",
+            "对外访问默认 http://<ECS公网IP>:8080/。",
+            "172.20.44.1 是私网 IP，仅同内网可访问，公网用户不可用。",
+          ],
+          commands: [
+            "echo '/opt/vue3-koa2-web + /opt/vue3-koa2-server'",
+            "echo '公网访问: http://<ECS公网IP>:8080/'",
+          ],
+        },
+        {
+          title: "1. 系统准备（首次部署）",
+          goal: "安装运行时工具并确认版本。",
+          tasks: [
+            "安装 git、podman、podman-compose（或 docker + compose）。",
+            "统一使用同一个用户执行全部命令（例如 admin）。",
+            "记录版本，方便后续排障。",
+          ],
+          commands: [
+            "sudo dnf install -y git podman podman-compose || sudo yum install -y git podman podman-compose",
+            "git --version && podman --version",
+            "whoami",
+          ],
+        },
+        {
+          title: "2. 从拉代码开始（首次 + 增量更新）",
+          goal: "确保前后端代码到位，并锁定分支 2026v1.0.0。",
+          tasks: [
+            "目录不存在时执行 clone；目录已存在时执行 fetch/checkout/pull。",
+            "不要在不同用户之间混用 sudo git 和普通 git，避免权限错乱。",
+            "确保前后端都在 2026v1.0.0。",
+          ],
+          commands: [
+            "cd /opt",
+            "[ ! -d vue3-koa2-web/.git ] && git clone -b 2026v1.0.0 https://gitee.com/shixiaol/vue3-koa2-web.git || true",
+            "[ ! -d vue3-koa2-server/.git ] && git clone -b 2026v1.0.0 https://gitee.com/shixiaol/vue3-koa2-server.git || true",
+            "cd /opt/vue3-koa2-web && git fetch --all && git checkout 2026v1.0.0 && git pull",
+            "cd /opt/vue3-koa2-server && git fetch --all && git checkout 2026v1.0.0 && git pull",
+          ],
+        },
+        {
+          title: "3. 目录权限与 .env 配置",
+          goal: "解决 Permission denied，保证服务读取到真实密钥。",
+          tasks: [
+            "目录若由 root clone，需要 chown 给当前执行用户。",
+            "创建 .env 并填写真实 OPENAI_API_KEY（不要占位符）。",
+            "后续 compose 一律从 /opt/vue3-koa2-server 执行。",
+          ],
+          commands: [
+            "sudo chown -R admin:admin /opt/vue3-koa2-web /opt/vue3-koa2-server",
+            "cd /opt/vue3-koa2-server",
+            "cp .env.example .env",
+            "vi .env",
+            "grep -E 'OPENAI_API_KEY|DEEPSEEK_API_KEY|DASHSCOPE_API_KEY' .env",
+          ],
+        },
+        {
+          title: "4. 可选：镜像拉取超时处理",
+          goal: "ECS 出网不稳定时切镜像源，避免构建卡死。",
+          tasks: [
+            "node/nginx/mongo 镜像替换为可访问镜像源。",
+            "替换后先单独 build，确认镜像能成功生成。",
+            "线上建议使用 docker-compose.ecs.yml 作为覆盖文件，不改本地 compose。",
+          ],
+          commands: [
+            "sed -i 's#FROM node:20-bullseye-slim#FROM docker.m.daocloud.io/library/node:20-bullseye-slim#g' /opt/vue3-koa2-server/Dockerfile",
+            "sed -i 's#FROM node:20-bullseye-slim as builder#FROM docker.m.daocloud.io/library/node:20-bullseye-slim as builder#g' /opt/vue3-koa2-web/Dockerfile",
+            "sed -i 's#FROM nginx:1.27-alpine#FROM docker.m.daocloud.io/library/nginx:1.27-alpine#g' /opt/vue3-koa2-web/Dockerfile",
+            "ls -la /opt/vue3-koa2-server/docker-compose.ecs.yml",
+          ],
+        },
+        {
+          title: "5. 构建前代码校验（Linux 大小写）",
+          goal: "避免 Vite 在 Linux 报 ENOENT。",
+          tasks: [
+            "检查 router import 与真实目录大小写是否一致。",
+            "典型问题：views/Cesium 与 views/cesium 不一致。",
+            "修完再 build 前端镜像。",
+          ],
+          commands: [
+            "cd /opt/vue3-koa2-web",
+            "grep -n 'cesiumLayer' src/router/index.js",
+            "find src/views -iname '*cesium*layer*.vue'",
+            "sed -i 's#@/views/Cesium/cesiumLayer.vue#@/views/cesium/cesiumLayer.vue#g' src/router/index.js",
+          ],
+        },
+        {
+          title: "6. 手动构建镜像（推荐）",
+          goal: "避免 compose 误从远程拉 my_project_web。",
+          tasks: [
+            "先分别构建前后端镜像。",
+            "镜像名使用 localhost 前缀，避免被识别成远程仓库。",
+            "构建成功后再用 compose 启动。",
+          ],
+          commands: [
+            "cd /opt/vue3-koa2-web && podman build -t localhost/my_project_web:latest -f Dockerfile .",
+            "cd /opt/vue3-koa2-server && podman build -t localhost/my_project_webserver:latest -f Dockerfile .",
+            "podman images | grep -E 'my_project_web|my_project_webserver'",
+          ],
+        },
+        {
+          title: "7. 启动前后端与数据库",
+          goal: "从后端目录一次性启动服务。",
+          tasks: [
+            "必须在 /opt/vue3-koa2-server 目录执行 compose。",
+            "建议优先 --no-build 使用已构建镜像，减少外网依赖。",
+            "线上使用 docker-compose.yml + docker-compose.ecs.yml 叠加启动。",
+          ],
+          commands: [
+            "cd /opt/vue3-koa2-server",
+            "docker compose -f docker-compose.yml -f docker-compose.ecs.yml --project-name my_project down",
+            "docker compose -f docker-compose.yml -f docker-compose.ecs.yml --project-name my_project --env-file .env up -d --no-build",
+            "docker compose -f docker-compose.yml -f docker-compose.ecs.yml --project-name my_project ps",
+          ],
+        },
+        {
+          title: "8. 健康检查（必须做）",
+          goal: "确认 web、webserver、mongo 都稳定运行。",
+          tasks: [
+            "查看容器状态，确保都为 Up。",
+            "查看关键日志确认无持续报错。",
+            "本机探测 8080 端口是否可访问。",
+          ],
+          commands: [
+            "podman ps",
+            "podman logs --tail=100 vue3-koa2-web",
+            "podman logs --tail=100 vue3-koa2-server",
+            "curl -I http://127.0.0.1:8080",
+          ],
+        },
+        {
+          title: "9. 安全组与防火墙",
+          goal: "打通公网入口，避免容器已启动但外网不通。",
+          tasks: [
+            "阿里云安全组入方向放行 8080（或你映射端口）。",
+            "若开启 firewalld，需同步开放端口。",
+            "先本机 curl 通，再外网浏览器访问。",
+          ],
+          commands: [
+            "sudo firewall-cmd --add-port=8080/tcp --permanent || true",
+            "sudo firewall-cmd --reload || true",
+            "echo '安全组放行 8080/tcp'",
+          ],
+        },
+        {
+          title: "10. 域名与 HTTPS（上线建议）",
+          goal: "从公网 IP 访问升级为域名+证书访问。",
+          tasks: [
+            "域名 A 记录解析到 ECS 公网 IP。",
+            "Nginx 或 SLB 配置 443 证书，80 跳转 443。",
+            "前端 ws 协议会自动跟随 http/https 切换。",
+          ],
+          commands: [
+            "echo 'A记录 -> ECS公网IP'",
+            "echo '配置SSL证书后开放443端口'",
+          ],
+        },
+        {
+          title: "11. 日常更新发布流程",
+          goal: "后续迭代使用固定步骤，减少线上风险。",
+          tasks: [
+            "先 git pull 到目标分支，再构建镜像。",
+            "更新前先记录当前镜像 tag 以便回滚。",
+            "启动后执行健康检查与页面冒烟测试。",
+          ],
+          commands: [
+            "cd /opt/vue3-koa2-web && git fetch --all && git checkout 2026v1.0.0 && git pull",
+            "cd /opt/vue3-koa2-server && git fetch --all && git checkout 2026v1.0.0 && git pull",
+            "docker compose -f docker-compose.yml -f docker-compose.ecs.yml --project-name my_project --env-file .env up -d --no-build",
+          ],
+        },
+        {
+          title: "12. 回滚与紧急处理",
+          goal: "上线异常时快速恢复服务。",
+          tasks: [
+            "保留上一版镜像 tag（不要只用 latest）。",
+            "切回上一版镜像后重启 compose。",
+            "若接口异常先看 server 日志，再看 mongo 状态。",
+          ],
+          commands: [
+            "podman images",
+            "podman logs --tail=200 vue3-koa2-server",
+            "podman logs --tail=200 vue3-koa2-web",
           ],
         },
       ],
@@ -386,6 +612,12 @@ export default {
     closeLearningPlan() {
       this.showLearningPlan = false;
     },
+    openDeployGuide() {
+      this.showDeployGuide = true;
+    },
+    closeDeployGuide() {
+      this.showDeployGuide = false;
+    },
   },
   beforeUnmount() {
     if (this.socket) {
@@ -465,6 +697,25 @@ export default {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 12px 28px rgba(15, 118, 110, 0.2);
+}
+
+.hero-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.deploy-entry {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #0f4c81, #155e75);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(14, 116, 144, 0.2);
 }
 
 .hero-badge {
@@ -921,6 +1172,18 @@ export default {
 .plan-item li {
   margin: 6px 0;
   line-height: 1.6;
+}
+
+.guide-code {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f7fafc;
+  color: #1f3347;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
 }
 
 @keyframes pulse {
