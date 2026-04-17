@@ -13,6 +13,8 @@ export const ROUTE_WHITELIST = [
   "/deepSeek",
   "/PowerChart",
   "/DandelionPretext",
+  "/other-function/code-lab",
+  "/code-lab",
 ];
 export const ininCoordinates = {
   longitude: 117.0, // 替换为具体的目标经纬度
