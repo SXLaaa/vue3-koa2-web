@@ -13,6 +13,8 @@ export const ROUTE_WHITELIST = [
   "/deepSeek",
   "/PowerChart",
   "/DandelionPretext",
+  "/other-function/code-lab",
+  "/code-lab",
   "/imageWatermark",
 ];
 export const ininCoordinates = {

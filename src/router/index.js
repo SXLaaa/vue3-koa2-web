@@ -82,6 +82,15 @@ const routes = [
         },
         component: () => import("@/views/OtherFunction/ImageWatermark.vue"),
       },
+      {
+        name: "CodeLab",
+        path: "/other-function/code-lab",
+        alias: "/code-lab",
+        meta: {
+          title: "代码练习台",
+        },
+        component: () => import("@/views/OtherFunction/CodeLab.vue"),
+      },
     ],
   },
   {
