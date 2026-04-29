@@ -73,6 +73,15 @@ const routes = [
         component: () =>
           import("@/components/OtherFunction/DandelionPretext.vue"),
       },
+      {
+        name: "imageWatermark",
+        path: "/imageWatermark",
+        alias: "/other-function/image-watermark",
+        meta: {
+          title: "图片加水印",
+        },
+        component: () => import("@/views/OtherFunction/ImageWatermark.vue"),
+      },
     ],
   },
   {

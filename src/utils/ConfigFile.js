@@ -4,7 +4,7 @@
  * @Date: 2024-06-26 10:11:51
  * @LastEditTime: 2026-04-08 10:14:24
  * @LastEditors: shixiaolei
- * @Description: 
+ * @Description:
  */
 export const ROUTE_WHITELIST = [
   "/login",
@@ -13,6 +13,7 @@ export const ROUTE_WHITELIST = [
   "/deepSeek",
   "/PowerChart",
   "/DandelionPretext",
+  "/imageWatermark",
 ];
 export const ininCoordinates = {
   longitude: 117.0, // 替换为具体的目标经纬度
