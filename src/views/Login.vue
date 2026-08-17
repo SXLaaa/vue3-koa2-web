@@ -49,7 +49,8 @@ export default {
         if(valid){
           this.$api.login(this.user).then((res)=> {
             this.$store.commit('saveUserInfo', res)
-            this.$router.push('/welcome')
+            const redirect = this.$route.query.redirect
+            this.$router.replace(typeof redirect === 'string' && redirect.startsWith('/') ? redirect : '/welcome')
           })
         }else{
           return false

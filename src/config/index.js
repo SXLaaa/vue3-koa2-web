@@ -5,14 +5,17 @@ const env = import.meta.env.MODE || 'prod';
 const EnvConfig = {
     dev:{
         baseApi:'/',
+        agentApi:'/agent-api',
         mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     },
     test:{
         baseApi:'//test.futurefe.com/api',
+        agentApi:'http://127.0.0.1:3100/api',
         mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     },
     prod:{
         baseApi:'//futurefe.com/api',
+        agentApi:'http://127.0.0.1:3100/api',
         mockApi:'https://www.fastmock.site/mock/4f8a76c109fe7d95e131ee5a72d23dff/api'
     }
 }
