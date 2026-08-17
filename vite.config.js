@@ -8,7 +8,7 @@ module.exports = defineConfig({
     port: 8080,
     proxy: {
       '/agent-api': {
-        target: 'http://127.0.0.1:3100',
+        target: 'http://127.0.0.1:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/agent-api/, '/api')
       }
