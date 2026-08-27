@@ -155,6 +155,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import loginBackgroundUrl from '@/assets/login/loginBg.8736acfa.jpg'
 import '@/assets/login/loginBtn.3a0cafe8.png'
+import { toCaptchaImageUrl } from '@/features/login/captchaImage'
 import type { AuthService, LoginCredentials } from '@/services/authService'
 import '@/styles/login.css'
 
@@ -193,11 +194,6 @@ function getAuthService(): AuthService {
 function clearFieldError(field: LoginField): void {
   errors[field] = ''
   notice.value = null
-}
-
-function toCaptchaImageUrl(image: string): string {
-  if (!image) return ''
-  return image.startsWith('data:') ? image : `data:image/gif;base64,${image}`
 }
 
 async function refreshCaptcha(): Promise<void> {

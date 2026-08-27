@@ -12,6 +12,7 @@ const { resolveDashboardGate, DASHBOARD_HOME_HASH, LOGIN_HASH } = await import(
 const { dashboardApiEndpoints } = await import('../src/services/dashboardApi.ts')
 const { createLoginApi } = await import('../src/services/loginApi.ts')
 const { createAuthService, AUTH_SESSION_KEY } = await import('../src/services/authService.ts')
+const { toCaptchaImageUrl } = await import('../src/features/login/captchaImage.ts')
 const { parseRuntimeConfig, assertProductionRuntimeConfig } = await import(
   '../src/config/runtimeConfig.ts'
 )
@@ -104,6 +105,15 @@ async function verifyAuthContract() {
   )
 }
 
+function verifyCaptchaImageCompatibility() {
+  assert.equal(
+    toCaptchaImageUrl('PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=='),
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==',
+  )
+  assert.equal(toCaptchaImageUrl('R0lGODlhAQABAIAAAAUEBA=='), 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBA==')
+  assert.equal(toCaptchaImageUrl('data:image/png;base64,local'), 'data:image/png;base64,local')
+}
+
 function verifyProductionConfig() {
   const config = parseRuntimeConfig({}, {
     VITE_API_BASE_URL: '/agro-admin',
@@ -165,6 +175,7 @@ verifyNavigationContract()
 verifyRouteGate()
 verifyApiContract()
 await verifyAuthContract()
+verifyCaptchaImageCompatibility()
 verifyProductionConfig()
 await verifyNoForbiddenRuntimeTargets()
 
