@@ -61,7 +61,7 @@
             type="button"
             class="topTypeItem"
             :class="{ checkTopType: weatherAlertType === type }"
-            @click="weatherAlertType = type"
+            @click="selectWeatherType(type)"
           >
             {{ type }}
           </button>
@@ -728,6 +728,10 @@ import weatherTemperatureIcon from '@/assets/screen/weather-temperature.png'
 import weatherWindIcon from '@/assets/screen/weather-wind.png'
 import { dashboardModules, getDefaultDashboardSubId } from '@/config/dashboardNavigation'
 import { fetchScreenData } from '@/services/dashboardApi'
+import {
+  WEATHER_ALERT_TYPES,
+  selectWeatherAlertType,
+} from '@/services/weatherAlertState'
 import type { DashboardRequestContext } from '@/types/dashboardApi'
 import type { ChartBlock, DistrictStat, MapTheme, ModuleKey, ScreenPayload } from '@/types/dashboard'
 
@@ -802,7 +806,7 @@ const farmlandAnalysisMode = ref<'area' | 'trend'>('area')
 const protectionSummaryMode = ref<'area' | 'count'>('area')
 const protectionAnalysisMode = ref<'area' | 'count'>('area')
 const weatherPage = ref<'current' | 'forecast'>('current')
-const weatherAlertType = ref('高温')
+const weatherAlertType = computed(() => activeCrop.value || '高温')
 const selectedReportIndex = ref<number | null>(null)
 let loadRequestId = 0
 
@@ -873,7 +877,7 @@ const secondaryPanel = computed(() => screenData.value.panels[1])
 const growthStageNames = computed(() => screenData.value.headline.map((item) => item.label))
 const warningReportColors = ['#00d4ff', '#ffb800', '#00ff88', '#ff6b6b']
 const weatherAlertColors = ['#30c1ff', '#ff8c00', '#ff4444']
-const weatherAlertTypes = ['高温', '低温', '干旱', '洪涝']
+const weatherAlertTypes = WEATHER_ALERT_TYPES
 const weatherIcons = [weatherTemperatureIcon, weatherHumidityIcon, weatherWindIcon, weatherRainIcon]
 const plantingCompletion = computed(() => screenData.value.headline[0] ?? { value: 0, unit: '%' })
 const plantingPlan = computed(() => screenData.value.headline[1] ?? { value: '--', unit: '万亩' })
@@ -1114,6 +1118,15 @@ function selectCrop(crop: string): void {
   void loadScreenData(false, { timelineEdge: 'last' })
 }
 
+// 气象按钮与 activeCrop 使用同一状态源，切换后复位时间轴并重新请求当前页面。
+function selectWeatherType(type: string): void {
+  const selection = selectWeatherAlertType(weatherAlertType.value, type)
+  if (!selection.changed) return
+  activeCrop.value = selection.crop
+  activeTimelineIndex.value = selection.timelineIndex
+  void loadScreenData(false, { crop: selection.crop, timelineEdge: 'last' })
+}
+
 function selectDistrict(district: DistrictStat | null): void {
   if (district?.name === selectedDistrict.value?.name) return
   selectedDistrict.value = district
@@ -1141,7 +1154,9 @@ function buildRequestOverrides(includeTimeline: boolean): Partial<DashboardReque
   const yearText = timelineValue.match(/\d{4}/u)?.[0]
 
   if (timelineItem) {
-    requestOverrides.year = yearText ? Number(yearText) : screenData.value.year
+    requestOverrides.year = activeModule.value === 'warning'
+      ? screenData.value.year
+      : yearText ? Number(yearText) : screenData.value.year
     if (/上/u.test(timelineValue)) requestOverrides.halfYear = 1
     if (/下/u.test(timelineValue)) requestOverrides.halfYear = 2
     if (activeModule.value === 'warning') {
@@ -1176,9 +1191,14 @@ async function loadScreenData(
     const result = await fetchScreenData(moduleKey, subId, requestOverrides)
     if (requestId !== loadRequestId) return
     screenData.value = result.data
-    activeCrop.value = result.data.cropOptions?.find(
+    const matchedCrop = result.data.cropOptions?.find(
       (option) => option.value === requestedCrop || option.label === result.data.crop,
-    )?.value ?? result.data.cropOptions?.[0]?.value ?? ''
+    )?.value
+    activeCrop.value = matchedCrop
+      ?? (moduleKey === 'warning' && subId === 'weatherDisaster' && requestedCrop
+        ? requestedCrop
+        : result.data.cropOptions?.[0]?.value)
+      ?? ''
     activeTimelineIndex.value = Math.max(
       0,
       result.data.timeline?.findIndex((item) => item.active) ?? 0,

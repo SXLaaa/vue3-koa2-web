@@ -57,6 +57,22 @@ function readLoopbackTarget(value: string | undefined): string {
   return target.origin
 }
 
+function readMapProxyTarget(value: string | undefined, field: string): string | undefined {
+  if (!value) return undefined
+  const target = new URL(value)
+  if (
+    !['http:', 'https:'].includes(target.protocol)
+    || target.username
+    || target.password
+    || target.pathname !== '/'
+    || target.search
+    || target.hash
+  ) {
+    throw new Error(`${field} must be an HTTP(S) origin without credentials or a path`)
+  }
+  return target.origin
+}
+
 export default defineConfig(({ mode }) => {
   if (!supportedModes.has(mode)) {
     throw new Error(`Unsupported Vite mode "${mode}". Use localhost or production.`)
@@ -74,12 +90,39 @@ export default defineConfig(({ mode }) => {
   }
 
   const proxy = mode === 'localhost'
-    ? {
+    ? (() => {
+        const historicalGeoServerTarget = readMapProxyTarget(
+          env.LOCAL_HISTORICAL_GEOSERVER_TARGET,
+          'LOCAL_HISTORICAL_GEOSERVER_TARGET',
+        )
+        const newGeoServerTarget = readMapProxyTarget(
+          env.LOCAL_NEW_GEOSERVER_TARGET,
+          'LOCAL_NEW_GEOSERVER_TARGET',
+        )
+        return {
         '/agro-admin': {
           target: readLoopbackTarget(env.LOCAL_API_TARGET),
           changeOrigin: true,
         },
-      }
+          ...(historicalGeoServerTarget
+            ? {
+                '/geoserver': {
+                  target: historicalGeoServerTarget,
+                  changeOrigin: true,
+                },
+              }
+            : {}),
+          ...(newGeoServerTarget
+            ? {
+                '/map-service/new': {
+                  target: newGeoServerTarget,
+                  changeOrigin: true,
+                  rewrite: (path: string) => path.replace(/^\/map-service\/new/u, ''),
+                },
+              }
+            : {}),
+        }
+      })()
     : undefined
 
   return {

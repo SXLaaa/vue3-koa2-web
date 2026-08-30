@@ -28,6 +28,7 @@ import type {
   YieldStatisticsDto,
 } from '../types/dashboardApi.ts'
 import { resolveMapResponseMode } from '../config/mapLayerServices.ts'
+import { toSameOriginMapServiceUrl } from './mapServiceProxy.ts'
 
 interface PagePresentation {
   title: string
@@ -172,14 +173,19 @@ function rowsOf<T>(bag: DashboardResponseBag, endpoint: DashboardEndpointKey): T
   return envelope && 'rows' in envelope && Array.isArray(envelope.rows) ? envelope.rows : []
 }
 
-function mapServiceUrl(value: unknown): string | undefined {
+function mapServiceUrl(value: unknown, effectiveYear: number | undefined): string | undefined {
   if (typeof value !== 'string') return undefined
   const url = value.trim()
   if (!url || /\s|[\u0000-\u001f\u007f]|\\/u.test(url)) return undefined
   if (url.startsWith('/')) return url.startsWith('//') ? undefined : url
   try {
     const parsed = new URL(url)
-    return ['http:', 'https:'].includes(parsed.protocol) && !parsed.username && !parsed.password ? url : undefined
+    if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) return undefined
+    const runtimeYear = typeof window === 'undefined'
+      ? undefined
+      : window.__MAIN_GRAIN_CONFIG__?.newGeoServerStartYear
+    const newGeoServerStartYear = Number.isInteger(runtimeYear) ? Number(runtimeYear) : 2026
+    return toSameOriginMapServiceUrl(url, effectiveYear, newGeoServerStartYear)
   } catch {
     return undefined
   }
@@ -202,7 +208,7 @@ function attachMapService(context: DashboardRequestContext, bag: DashboardRespon
   if (!envelope || mode === 'none') return
 
   if (mode === 'layer' && typeof envelope.msg === 'string') {
-    const serviceUrl = mapServiceUrl(envelope.msg)
+    const serviceUrl = mapServiceUrl(envelope.msg, context.year)
     if (!serviceUrl) return
     const query = serviceUrl.includes('?') ? serviceUrl.slice(serviceUrl.indexOf('?') + 1) : serviceUrl
     const layerName = new URLSearchParams(query).get('layers')?.trim()
@@ -214,7 +220,7 @@ function attachMapService(context: DashboardRequestContext, bag: DashboardRespon
     return
   }
 
-  const serviceUrl = mapServiceUrl(envelope.msg)
+  const serviceUrl = mapServiceUrl(envelope.msg, context.year)
   if (mode === 'query' && serviceUrl) {
     payload.map.serviceMode = mode
     payload.map.serviceUrl = serviceUrl
@@ -751,9 +757,11 @@ export function inferDashboardContext(context: DashboardRequestContext, bag: Das
   const inferredMonth = effectiveDate ? Number(effectiveDate.slice(5, 7)) : undefined
   const requestedTimeline = timeline?.find((item) => numberValue(item.timeYear) === context.year)
   const resolvedTimeline = requestedTimeline ?? timelineDefault
+  const reproductiveYear = numberValue(reproductive?.year)
   return {
     ...context,
-    year: dateYear(effectiveDate) ?? numberValue(reproductive?.year) ?? numberValue(resolvedTimeline?.timeYear) ?? context.year,
+    // year 表示作物生产季；跨年小麦的观测日期只决定 date，不得覆盖生产季年份。
+    year: reproductiveYear ?? numberValue(resolvedTimeline?.timeYear) ?? context.year ?? dateYear(effectiveDate),
     yearMonth: effectiveDate?.slice(0, 7) ?? context.yearMonth,
     halfYear: context.halfYear ?? resolvedTimeline?.halfYear
       ?? (inferredMonth && inferredMonth >= 1 && inferredMonth <= 12 ? inferredMonth <= 6 ? 1 : 2 : undefined),

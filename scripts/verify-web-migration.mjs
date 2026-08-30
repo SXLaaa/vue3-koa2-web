@@ -149,19 +149,16 @@ async function collectFiles(directory) {
   return files
 }
 
-async function verifyNoForbiddenRuntimeTargets() {
+async function verifyNoDirectGeoServerTargets() {
   const candidates = [
     ...await collectFiles(path.join(projectRoot, 'src')),
     path.join(projectRoot, 'public', 'config.js'),
     path.join(projectRoot, '.env.production'),
-    path.join(projectRoot, '.env.localhost.local'),
     path.join(projectRoot, 'vite.config.ts'),
   ]
   const forbidden = [
-    /27\.223\.102\.27/iu,
     /192\.168\.71\.209/iu,
-    /home\.aceimage\.cn/iu,
-    /(?:^|\.)tianditu\.gov\.cn/imu,
+    /https?:\/\/(?:27\.223\.102\.27|home\.aceimage\.cn)(?::\d+)?\/geoserver/iu,
   ]
   for (const file of candidates) {
     const content = await readFile(file, 'utf8')
@@ -177,6 +174,6 @@ verifyApiContract()
 await verifyAuthContract()
 verifyCaptchaImageCompatibility()
 verifyProductionConfig()
-await verifyNoForbiddenRuntimeTargets()
+await verifyNoDirectGeoServerTargets()
 
-console.log('WEB_MIGRATION_CHECK=PASS pages=12 endpoints=33 apiBase=/agro-admin mockFallback=0 forbiddenTargets=0')
+console.log('WEB_MIGRATION_CHECK=PASS pages=12 endpoints=33 apiBase=/agro-admin mockFallback=0 directGeoServerTargets=0')

@@ -8,7 +8,9 @@
     "build": "vue-tsc -b && vite build --mode production",
     "preview": "vite preview --host 127.0.0.1",
     "check:type": "vue-tsc -b",
-    "test:migration": "node --experimental-strip-types scripts/verify-web-migration.mjs"
+    "test:migration": "node --experimental-strip-types scripts/verify-web-migration.mjs",
+    "test:map-proxy": "node --experimental-strip-types scripts/verify-map-service-proxy.mjs",
+    "test:data": "node --experimental-strip-types scripts/verify-dashboard-data-fixes.mjs"
   },
   "dependencies": {
     "echarts": "^6.0.0",

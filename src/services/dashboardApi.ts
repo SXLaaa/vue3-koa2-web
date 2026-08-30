@@ -90,7 +90,7 @@ function yearMonth(context: DashboardRequestContext): string {
 
 function yearFromContext(context: DashboardRequestContext): number | undefined {
   const fromDate = context.date?.match(/^\d{4}/u)?.[0]
-  return fromDate ? Number(fromDate) : context.year
+  return context.year ?? (fromDate ? Number(fromDate) : undefined)
 }
 
 function normalizeCropName(crop: string | undefined): string | undefined {
@@ -115,7 +115,7 @@ function appendMapRequest(requests: DashboardRequestSpec[], context: DashboardRe
   if (context.moduleKey === 'warning') {
     if (!context.date) throw new Error(`getVectorTableWms: date is required for ${pageKey(context)}`)
     if (!typeName) throw new Error(`getVectorTableWms: crop is required for ${pageKey(context)}`)
-    requests.push(request('getVectorTableWms', { columnKey, yearDay: context.date, typeName }))
+    requests.push(request('getVectorTableWms', { columnKey, year: context.year, yearDay: context.date, typeName }))
     return
   }
   if (context.year === undefined) throw new Error(`getVectorTableWms: year is required for ${pageKey(context)}`)
@@ -197,7 +197,7 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
       request('queryProtectionMonitoringTotal', { areaName, year: context.year, lastYear: context.halfYear, typeName, columnKey, parentAreaName, unit: 2 }),
       request('queryProtectionMonitoringByArea', { columnKey, year: context.year, typeName, unit: 2, parentAreaName }),
       request('queryProtectionMonitoringByYear', { columnKey, typeName, areaName, unit: 2 }),
-      request('queryReportList', { columnKey, pageNum: 1, pageSize: 10, reportType: 3, year: context.year, halfYear: context.halfYear }),
+      request('queryReportList', { columnKey, pageNum: 1, pageSize: 10, reportType: 3, year: context.year, halfYear: context.halfYear, typeName }),
     )
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
@@ -209,7 +209,7 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
       request('statisticsYield', { columnKey, year: context.year, lastYear: context.halfYear, typeName, areaName, parentAreaName }),
       request('queryYieldTotalByArea', { columnKey, year: context.year, typeName, parentAreaName }),
       request('queryYieldTotalByYear', { columnKey, typeName, areaName }),
-      request('queryReportList', { columnKey, pageNum: 1, pageSize: 10, reportType: 2, year: context.year, halfYear: context.halfYear }),
+      request('queryReportList', { columnKey, pageNum: 1, pageSize: 10, reportType: 2, year: context.year, halfYear: context.halfYear, typeName }),
     )
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
@@ -219,7 +219,7 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
     requests.push(
       request('queryCropType', { columnKey }),
       request('getReproductiveTimeLine', { columnKey, year: context.year, typeName }),
-      request('queryReproductiveAnalysis', { columnKey, yearDay: context.date, typeName, areaName }),
+      request('queryReproductiveAnalysis', { columnKey, year: context.year, yearDay: context.date, typeName, areaName }),
     )
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
@@ -230,9 +230,9 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
     requests.push(
       request('queryCropType', { columnKey }),
       request('getReproductiveTimeLine', { columnKey, year: context.year, typeName }),
-      request('queryReproductivePeriodByDate', { typeName, yearDay: context.date }),
-      request('querySeedlingConditionAnalysis', { yearDay: context.date, columnKey, typeName, areaName: seedlingAreaName }),
-      request('queryReportList', { pageNum: 1, pageSize: 100, reportType: 4, year: context.year, halfYear: context.halfYear }),
+      request('queryReproductivePeriodByDate', { typeName, year: context.year, yearDay: context.date }),
+      request('querySeedlingConditionAnalysis', { year: context.year, yearDay: context.date, columnKey, typeName, areaName: seedlingAreaName }),
+      request('queryReportList', { pageNum: 1, pageSize: 100, reportType: 4, year: context.year, halfYear: context.halfYear, typeName }),
     )
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
@@ -242,9 +242,9 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
     requests.push(
       request('queryCropType', { columnKey }),
       request('getReproductiveTimeLine', { columnKey, yearMonth: yearMonth(context), typeName }),
-      request('queryReproductivePeriodByDate', { typeName, yearDay: context.date }),
-      request('queryGrowthBarChart', { columnKey, typeName, yearDay: context.date, areaName }),
-      request('queryGrowthAnalysisByYear', { columnKey, typeName, areaName }),
+      request('queryReproductivePeriodByDate', { typeName, year: context.year, yearDay: context.date }),
+      request('queryGrowthBarChart', { columnKey, typeName, year: context.year, yearDay: context.date, areaName }),
+      request('queryGrowthAnalysisByYear', { columnKey, typeName, year: context.year, areaName }),
     )
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
@@ -254,7 +254,7 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
     requests.push(
       request('queryCropType', { columnKey }),
       request('getReproductiveTimeLine', { columnKey, yearMonth: yearMonth(context), typeName }),
-      request('getMaturityStageByDate', { yearDay: context.date, areaName, typeName }),
+      request('getMaturityStageByDate', { year: context.year, yearDay: context.date, areaName, typeName }),
       request('queryBestHarvestTime', { typeName, year: yearFromContext(context) }),
       request('queryMaturityStageByYear', { year: yearFromContext(context), areaName, typeName }),
     )
@@ -274,11 +274,11 @@ export function buildDashboardPageRequests(context: DashboardRequestContext, opt
     )
     if (pestMode) {
       requests.push(
-        request('queryPestWarningByDate', { yearDay: context.date, typeName, areaName }),
-        request('queryReportList', { pageNum: 1, pageSize: 100, reportType: 5, year: context.year, halfYear: context.halfYear }),
+        request('queryPestWarningByDate', { year: context.year, yearDay: context.date, typeName, areaName }),
+        request('queryReportList', { pageNum: 1, pageSize: 100, reportType: 5, year: context.year, halfYear: context.halfYear, typeName }),
       )
     } else {
-      requests.push(request('queryDisasterStatistics', { areaName, typeName }))
+      requests.push(request('queryDisasterStatistics', { areaName, typeName, year: context.year, yearDay: context.date }))
     }
     if (options.includeMapMetadata) appendMapRequest(requests, context, columnKey)
   }
