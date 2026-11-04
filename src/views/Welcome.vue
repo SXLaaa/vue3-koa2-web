@@ -17,35 +17,39 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.welcome{
+<style lang="scss" scoped>
+.welcome {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  gap: clamp(24px, 5vw, 80px);
+  min-height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
   background: #fff;
-  &-content{
-    &-title{
-      font-size: 30px;
-      line-height: 42px;
-      color: #333;
-    }
-    &-title2{
-      font-size: 30px;
-      line-height: 42px;
-      color: #409eff;
-    }
-    &-desc{
-      text-align: right;
-      font-size: 14px;
-      color: #999;
-    }
+  border: 1px solid #e7edf3;
+  border-radius: 16px;
+  .welcome-content-title {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: clamp(24px, 2.5vw, 34px);
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: #23364d;
+    white-space: nowrap;
   }
-  &-img{
-    margin-left: 100px;
-    width: 371px;
-    height: 438px;
-    background-image: url('../assets/images/welcome.png');
+  .welcome-img {
+    width: min(45%, 340px);
+    aspect-ratio: 371 / 438;
+    background: url('../assets/images/welcome.png') center / contain no-repeat;
+  }
+}
+@media (max-width: 700px) {
+  .welcome {
+    flex-direction: column;
+    padding: 32px 20px;
+    gap: 28px;
+    .welcome-img { width: min(75%, 280px); }
   }
 }
 </style>

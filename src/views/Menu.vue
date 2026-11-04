@@ -3,7 +3,7 @@
     <div class="query-form">
       <el-form ref="form" :inline="true" :model="queryForm">
         <el-form-item label="菜单名称" prop="menuName">
-          <el-input v-model="queryForm.menuName" placeholder="请输入用户ID" />
+          <el-input v-model="queryForm.menuName" placeholder="请输入菜单名称" />
         </el-form-item>
         <el-form-item label="菜单状态" prop="menuState">
           <el-select v-model="queryForm.menuState">
@@ -18,7 +18,7 @@
             v-has:query="'menu_query'"
             >查询</el-button
           >
-          <el-button @click="handleReset(form)">重置</el-button>
+          <el-button @click="handleReset('form'); getMenuList()">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -59,7 +59,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="用户新增" v-model="showModal">
+    <el-dialog :title="action === 'edit' ? '编辑菜单' : '新增菜单'" v-model="showModal">
       <el-form
         ref="dialogForm"
         :model="menuForm"
@@ -89,7 +89,7 @@
           prop="icon"
           v-show="menuForm.menuType == 1"
         >
-          <el-input v-model="menuForm.icon" placeholder="请输入岗位" />
+          <el-input v-model="menuForm.icon" placeholder="请输入图标名称，如 Menu" />
         </el-form-item>
         <el-form-item
           label="路由地址"
@@ -212,7 +212,7 @@ export default {
           {
             min: 2,
             max: 10,
-            message: "长度在2-8个字符",
+            message: "长度在2-10个字符",
             trigger: "blur",
           },
         ],

@@ -37,7 +37,7 @@ const routes = [
         meta: {
           title: "三维一张图(cesium)",
         },
-        component: () => import("@/views/Cesium/cesiumLayer.vue"),
+        component: () => import("@/views/cesium/cesiumLayer.vue"),
       },
       {
         name: "mapBoxLayer",
@@ -131,10 +131,17 @@ async function loadAsyncRoutes() {
         ...topLevelModules,
         ...topLevelTwoModules,
       };
-      routes.map((route) => {
-        let url = `../views/${route.component}.vue`;
-        route.component = concatModules[url];
-        router.addRoute("home", route);
+      routes.forEach((route) => {
+        // 静态页面及其别名保留原组件，避免后台菜单重复覆盖。
+        if (router.getRoutes().some((record) => record.path === route.path)) {
+          return;
+        }
+        const component = concatModules[`../views/${route.component}.vue`];
+        if (!component) {
+          console.warn("菜单组件不存在，已跳过路由:", route.path, route.component);
+          return;
+        }
+        router.addRoute("home", { ...route, component });
       });
     } catch (error) {
       // token 失效时清理本地登录态，避免登录页反复触发权限接口报错提示

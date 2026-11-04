@@ -214,13 +214,13 @@ export default {
 }
 
 .Layout {
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-size: 15px;
+  color: #263449;
   position: relative;
   height: 100vh;
   overflow: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 22%),
-    radial-gradient(circle at right top, rgba(245, 158, 11, 0.12), transparent 20%),
-    linear-gradient(135deg, #edf4f3 0%, #f8fbfa 50%, #f3efe6 100%);
+  background: #f3f6fa;
 
   &-side {
     position: fixed;
@@ -235,7 +235,7 @@ export default {
     overflow-y: auto;
     overflow-x: hidden;
     transition: transform 0.35s ease, box-shadow 0.35s ease;
-    box-shadow: 18px 0 40px rgba(15, 23, 42, 0.12);
+    box-shadow: 2px 0 12px rgba(15, 23, 42, 0.06);
 
     .sidebar-glow {
       position: absolute;
@@ -257,7 +257,7 @@ export default {
       min-height: 72px;
       margin-bottom: 18px;
       padding: 14px 16px;
-      border-radius: 24px;
+      border-radius: 14px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
       border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(10px);
@@ -267,7 +267,7 @@ export default {
     .nav-menu {
       position: relative;
       z-index: 1;
-      height: calc(100vh - 126px);
+      height: auto;
       border-right: none;
       background: transparent !important;
     }
@@ -300,8 +300,8 @@ export default {
       position: sticky;
       top: 0;
       z-index: 10;
-      height: 84px;
-      min-height: 84px;
+      height: 72px;
+      min-height: 72px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -309,9 +309,9 @@ export default {
       margin: 18px 18px 0;
       padding: 16px 22px;
       border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 24px;
+      border-radius: 14px;
       background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
       backdrop-filter: blur(14px);
 
       &-bread {
@@ -333,7 +333,7 @@ export default {
           font-size: 18px;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
-          box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+          box-shadow: none;
         }
 
         .menu-fold:hover {
@@ -365,7 +365,7 @@ export default {
           border: 1px solid rgba(15, 23, 42, 0.08);
           color: #17324c;
           font-size: 18px;
-          box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+          box-shadow: none;
         }
 
         .user-link {
@@ -405,82 +405,89 @@ export default {
 
     &-wrapper {
       padding: 18px;
-      height: calc(100vh - 100px);
+      height: calc(100vh - 90px);
       overflow: hidden;
 
       .content-shell {
-        height: calc(100vh - 136px);
-        border-radius: 28px;
+        height: 100%;
+        border-radius: 16px;
         overflow: auto;
         overscroll-behavior: contain;
       }
     }
   }
 
-  .brand-panel :deep(.logMain) {
+  .brand-panel .logMain {
     gap: 10px;
     color: #f8fbff;
     font-size: 18px;
     font-weight: 700;
     letter-spacing: 0.02em;
+    white-space: nowrap;
+    font-size: 16px;
   }
 
-  .nav-menu :deep(.el-menu-item),
-  .nav-menu :deep(.el-submenu__title) {
+  .nav-menu .el-menu-item,
+  .nav-menu .el-submenu__title {
     height: 48px;
+    line-height: 48px;
+    font-size: 15px;
     margin-bottom: 8px;
     border-radius: 16px;
     color: #d7e3f4 !important;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
   }
 
-  .nav-menu :deep(.el-menu-item:hover),
-  .nav-menu :deep(.el-submenu__title:hover) {
+  .nav-menu .el-menu-item:hover,
+  .nav-menu .el-submenu__title:hover {
     background: rgba(255, 255, 255, 0.09) !important;
     color: #ffffff !important;
     transform: translateX(2px);
   }
 
-  .nav-menu :deep(.el-menu-item.is-active) {
-    background: linear-gradient(135deg, rgba(15, 118, 110, 0.88), rgba(245, 158, 11, 0.88)) !important;
+  .nav-menu .el-menu-item.is-active {
+    background: #167d8d !important;
     color: #ffffff !important;
-    box-shadow: 0 14px 26px rgba(15, 118, 110, 0.22);
+    box-shadow: inset 3px 0 0 #8ee5e6;
   }
 
-  .nav-menu :deep(.el-submenu .el-menu-item) {
+  .nav-menu .el-submenu .el-menu-item {
     min-width: auto;
     padding-left: 48px !important;
     background: rgba(255, 255, 255, 0.03);
   }
 
-  .nav-menu :deep(.el-submenu .el-menu) {
+  .nav-menu .el-submenu .el-menu {
     background: transparent !important;
   }
 
-  .nav-menu :deep(.el-menu-item [class^="el-icon"]),
-  .nav-menu :deep(.el-submenu__title [class^="el-icon"]),
-  .nav-menu :deep(.el-menu-item .el-icon),
-  .nav-menu :deep(.el-submenu__title .el-icon) {
+  .nav-menu .el-menu-item [class^="el-icon"],
+  .nav-menu .el-submenu__title [class^="el-icon"],
+  .nav-menu .el-menu-item .el-icon,
+  .nav-menu .el-submenu__title .el-icon {
     margin-right: 10px;
     font-size: 17px;
   }
 
-  .Layout-right-top :deep(.el-breadcrumb) {
+  .brand-panel .pyramid-loader { flex-shrink: 0; width: 48px; }
+
+  .Layout-right-top .el-breadcrumb {
+    font-size: 14px;
     line-height: 1.4;
   }
 
-  .Layout-right-top :deep(.el-breadcrumb__inner),
-  .Layout-right-top :deep(.el-breadcrumb__inner a) {
+  .Layout-right-top .el-breadcrumb__inner,
+  .Layout-right-top .el-breadcrumb__inner a {
     color: #607180;
     font-weight: 500;
   }
 
-  .Layout-right-top :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+  .Layout-right-top .el-breadcrumb__item:last-child .el-breadcrumb__inner {
     color: #14263d;
     font-weight: 700;
   }
 
-  .Layout-right-top :deep(.el-badge__content.is-fixed.is-dot) {
+  .Layout-right-top .el-badge__content.is-fixed.is-dot {
     top: 10px;
     right: 10px;
     background: #ef4444;

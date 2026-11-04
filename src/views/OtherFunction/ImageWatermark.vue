@@ -1,273 +1,342 @@
 <template>
   <div class="watermark-container">
-    <!-- 标题 -->
+    <!-- 标题与模板 -->
     <div class="section-title">
       <h2>📸 图片加水印工具</h2>
+      <div class="template-toolbar">
+        <el-select v-model="selectedTemplate" placeholder="常用模板" size="small" clearable @change="applySavedTemplate">
+          <el-option v-for="item in savedTemplates" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+        <el-popover placement="bottom-end" :width="280" trigger="click">
+          <template #reference><el-button size="small">保存</el-button></template>
+          <div class="template-manager">
+            <label>模板名称</label>
+            <el-input v-model="templateName" placeholder="输入模板名称" maxlength="24" size="small" />
+            <el-button type="primary" size="small" @click="saveTemplate">{{ selectedTemplate ? "覆盖保存" : "保存模板" }}</el-button>
+          </div>
+        </el-popover>
+        <el-popover placement="bottom-end" :width="280" trigger="click">
+          <template #reference><el-button size="small">管理</el-button></template>
+          <div class="template-manager">
+            <label>重命名当前模板</label>
+            <el-input v-model="templateName" placeholder="先选择常用模板" maxlength="24" size="small" :disabled="!selectedTemplate" />
+            <div class="manager-actions">
+              <el-button size="small" :disabled="!selectedTemplate" @click="saveTemplate">保存修改</el-button>
+              <el-button size="small" type="danger" plain :disabled="!selectedTemplate" @click="deleteTemplate">删除模板</el-button>
+            </div>
+            <div class="manager-actions">
+              <el-button size="small" @click="templateInput?.click()">导入模板</el-button>
+              <el-button size="small" @click="exportTemplate">导出模板</el-button>
+            </div>
+          </div>
+        </el-popover>
+        <input ref="templateInput" type="file" accept=".json,application/json" style="display: none" @change="importTemplate" />
+      </div>
     </div>
 
-    <!-- 功能切换标签页 -->
-    <el-tabs v-model="activeTab" class="tabs">
-      <!-- 文字水印 -->
-      <el-tab-pane label="文字水印" name="text">
-        <div class="tab-content">
-          <!-- 上传区域 -->
-          <div class="upload-section">
-            <label class="section-label">1. 选择图片</label>
-            <div
-              class="upload-area"
-              @dragover.prevent
-              @drop.prevent="handleDrop"
-            >
-              <input
-                ref="fileInput"
-                type="file"
-                accept="image/*"
-                style="display: none"
-                @change="handleImageUpload"
-              />
-              <button class="upload-btn" @click="fileInput?.click()">
-                <el-icon><upload-filled /></el-icon>
-                <div>
-                  拖拽图片到此或<em style="color: #409eff">点击上传</em>
+    <div class="workspace-layout">
+      <!-- 左侧配置 -->
+      <div class="settings-panel">
+        <el-tabs v-model="activeTab" class="tabs">
+          <el-tab-pane label="文字水印" name="text">
+            <div class="mode-content">
+              <!-- 选择图片 -->
+              <div class="upload-section">
+                <div class="upload-area" @dragover.prevent @drop.prevent="handleDrop">
+                  <input ref="fileInput" type="file" accept="image/*" style="display: none" @change="handleImageUpload" />
+                  <button class="upload-btn" @click="fileInput?.click()">
+                    <el-icon><upload-filled /></el-icon>
+                    <span class="upload-name" :title="imageName">{{ originalImage ? (imageName || '已选择图片') : '拖拽图片到此，或点击选择' }}</span>
+                    <em v-if="originalImage">更换图片</em>
+                  </button>
+                  <div v-if="!originalImage" class="el-upload__tip">JPG / PNG / WebP，动图输出静态图</div>
                 </div>
-              </button>
-              <div class="el-upload__tip" style="margin-top: 10px">
-                支持 JPG, PNG, GIF 等常见图片格式
+              </div>
+
+              <!-- 文字水印配置 -->
+              <div class="config-section">
+                <div class="section-heading">
+                  <span class="section-label">水印配置</span>
+                  <div class="action-buttons">
+                    <el-button type="text" size="small" @click="addTextWatermarkAction()" :loading="processing" :disabled="!originalImage">重新生成</el-button>
+                    <el-button type="text" size="small" @click="resetText">重置</el-button>
+                  </div>
+                </div>
+
+                <div class="config-row full-row">
+                  <label>水印文字</label>
+                  <el-input v-model="textConfig.text" placeholder="输入水印文字" maxlength="80" />
+                </div>
+
+                <div class="config-row">
+                  <div class="config-label">
+                    字体大小
+                    <el-checkbox :model-value="textConfig.sizeMode === 'relative'" @change="textConfig.sizeMode = $event ? 'relative' : 'pixel'">随图</el-checkbox>
+                  </div>
+                  <div class="range-group">
+                    <el-slider
+                      v-if="textConfig.sizeMode === 'relative'"
+                      v-model="textConfig.fontSizeRatio"
+                      :min="0.01"
+                      :max="0.3"
+                      :step="0.005"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <el-slider
+                      v-else
+                      v-model="textConfig.fontSize"
+                      :min="10"
+                      :max="100"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <span class="value-display">{{ textConfig.sizeMode === "relative" ? (textConfig.fontSizeRatio * 100).toFixed(1) + "%" : textConfig.fontSize + "px" }}</span>
+                  </div>
+                </div>
+
+                <div class="config-row">
+                  <label>透明度</label>
+                  <div class="range-group">
+                    <el-slider
+                      v-model="textConfig.opacity"
+                      :min="0"
+                      :max="1"
+                      :step="0.05"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <span class="value-display"
+                      >{{ (textConfig.opacity * 100).toFixed(0) }}%</span
+                    >
+                  </div>
+                </div>
+
+                <div class="config-row">
+                  <label>水印位置</label>
+                  <el-select v-model="textConfig.position" style="width: 100%">
+                    <el-option label="左上" value="top-left" />
+                    <el-option label="右上" value="top-right" />
+                    <el-option label="左下" value="bottom-left" />
+                    <el-option label="右下" value="bottom-right" />
+                    <el-option label="中心" value="center" />
+                  </el-select>
+                </div>
+
+                <div class="config-row">
+                  <label>文字颜色</label>
+                  <el-color-picker
+                    v-model="textColor"
+                    show-alpha
+                    style="width: 100%"
+                  />
+                </div>
+
+                <div class="config-row">
+                  <label>{{ textConfig.sizeMode === "relative" ? "X边距（短边%）" : "X轴偏移 (px)" }}</label>
+                  <div v-if="textConfig.sizeMode === 'relative'" class="range-group">
+                    <el-slider v-model="textConfig.marginXRatio" :min="0" :max="0.3" :step="0.005" style="flex: 1; margin-right: 10px" />
+                    <span class="value-display">{{ (textConfig.marginXRatio * 100).toFixed(1) }}%</span>
+                  </div>
+                  <el-input-number
+                    v-else
+                    v-model="textConfig.offsetX"
+                    :min="0"
+                    :max="500"
+                    style="width: 100%"
+                  />
+                </div>
+
+                <div class="config-row">
+                  <label>{{ textConfig.sizeMode === "relative" ? "Y边距（短边%）" : "Y轴偏移 (px)" }}</label>
+                  <div v-if="textConfig.sizeMode === 'relative'" class="range-group">
+                    <el-slider v-model="textConfig.marginYRatio" :min="0" :max="0.3" :step="0.005" style="flex: 1; margin-right: 10px" />
+                    <span class="value-display">{{ (textConfig.marginYRatio * 100).toFixed(1) }}%</span>
+                  </div>
+                  <el-input-number
+                    v-else
+                    v-model="textConfig.offsetY"
+                    :min="0"
+                    :max="500"
+                    style="width: 100%"
+                  />
+                </div>
+                <div class="effect-row">
+                  <el-checkbox v-model="textConfig.outline">描边</el-checkbox>
+                  <el-checkbox v-model="textConfig.shadow">阴影</el-checkbox>
+                  <el-checkbox v-model="textConfig.background">底色</el-checkbox>
+                </div>
               </div>
             </div>
-          </div>
+          </el-tab-pane>
+          <el-tab-pane label="平铺水印" name="tiled">
+            <div class="mode-content">
+              <!-- 选择图片 -->
+              <div class="upload-section">
+                <div class="upload-area" @dragover.prevent @drop.prevent="handleDropTiled">
+                  <input ref="fileInputTiled" type="file" accept="image/*" style="display: none" @change="handleImageUploadTiled" />
+                  <button class="upload-btn" @click="fileInputTiled?.click()">
+                    <el-icon><upload-filled /></el-icon>
+                    <span class="upload-name" :title="imageNameTiled">{{ originalImageTiled ? (imageNameTiled || '已选择图片') : '拖拽图片到此，或点击选择' }}</span>
+                    <em v-if="originalImageTiled">更换图片</em>
+                  </button>
+                  <div v-if="!originalImageTiled" class="el-upload__tip">JPG / PNG / WebP，动图输出静态图</div>
+                </div>
+              </div>
 
-          <!-- 原始图片预览 -->
-          <div v-if="originalImage" class="preview-section">
-            <label class="section-label">原始图片</label>
-            <img :src="originalImage" class="preview-image" />
-          </div>
+              <!-- 平铺水印配置 -->
+              <div class="config-section">
+                <div class="section-heading">
+                  <span class="section-label">水印配置</span>
+                  <div class="action-buttons">
+                    <el-button type="text" size="small" @click="addTiledWatermarkAction()" :loading="processing" :disabled="!originalImageTiled">重新生成</el-button>
+                    <el-button type="text" size="small" @click="resetTiled">重置</el-button>
+                  </div>
+                </div>
 
-          <!-- 文字水印配置 -->
-          <div class="config-section">
-            <label class="section-label">2. 水印配置</label>
+                <div class="config-row full-row">
+                  <label>水印文字</label>
+                  <el-input v-model="tiledConfig.text" placeholder="输入水印文字" maxlength="80" />
+                </div>
 
-            <div class="config-row">
-              <label>水印文字</label>
-              <el-input v-model="textConfig.text" placeholder="输入水印文字" />
-            </div>
+                <div class="config-row">
+                  <div class="config-label">
+                    字体大小
+                    <el-checkbox :model-value="tiledConfig.sizeMode === 'relative'" @change="tiledConfig.sizeMode = $event ? 'relative' : 'pixel'">随图</el-checkbox>
+                  </div>
+                  <div class="range-group">
+                    <el-slider
+                      v-if="tiledConfig.sizeMode === 'relative'"
+                      v-model="tiledConfig.fontSizeRatio"
+                      :min="0.01"
+                      :max="0.3"
+                      :step="0.005"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <el-slider
+                      v-else
+                      v-model="tiledConfig.fontSize"
+                      :min="15"
+                      :max="80"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <span class="value-display">{{ tiledConfig.sizeMode === "relative" ? (tiledConfig.fontSizeRatio * 100).toFixed(1) + "%" : tiledConfig.fontSize + "px" }}</span>
+                  </div>
+                </div>
 
-            <div class="config-row">
-              <label>字体大小</label>
-              <div class="range-group">
-                <el-slider
-                  v-model="textConfig.fontSize"
-                  :min="10"
-                  :max="100"
-                  style="flex: 1; margin-right: 10px"
-                />
-                <span class="value-display">{{ textConfig.fontSize }}px</span>
+                <div class="config-row">
+                  <label>透明度</label>
+                  <div class="range-group">
+                    <el-slider
+                      v-model="tiledConfig.opacity"
+                      :min="0"
+                      :max="1"
+                      :step="0.05"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <span class="value-display"
+                      >{{ (tiledConfig.opacity * 100).toFixed(0) }}%</span
+                    >
+                  </div>
+                </div>
+
+                <div class="config-row">
+                  <label>旋转角度</label>
+                  <div class="range-group">
+                    <el-slider
+                      v-model="tiledConfig.angle"
+                      :min="-90"
+                      :max="90"
+                      style="flex: 1; margin-right: 10px"
+                    />
+                    <span class="value-display">{{ tiledConfig.angle }}°</span>
+                  </div>
+                </div>
+
+                <div class="config-row">
+                  <label>{{ tiledConfig.sizeMode === "relative" ? "间距（短边%）" : "水印间距 (px)" }}</label>
+                  <div v-if="tiledConfig.sizeMode === 'relative'" class="range-group">
+                    <el-slider v-model="tiledConfig.spacingRatio" :min="0.02" :max="1" :step="0.01" style="flex: 1; margin-right: 10px" />
+                    <span class="value-display">{{ Math.round(tiledConfig.spacingRatio * 100) }}%</span>
+                  </div>
+                  <el-input-number
+                    v-else
+                    v-model="tiledConfig.spacing"
+                    :min="30"
+                    :max="300"
+                    style="width: 100%"
+                  />
+                </div>
+
+                <div class="config-row">
+                  <label>文字颜色</label>
+                  <el-color-picker
+                    v-model="tiledColor"
+                    show-alpha
+                    style="width: 100%"
+                  />
+                </div>
+                <div class="effect-row">
+                  <el-checkbox v-model="tiledConfig.outline">描边</el-checkbox>
+                  <el-checkbox v-model="tiledConfig.shadow">阴影</el-checkbox>
+                  <el-checkbox v-model="tiledConfig.background">底色</el-checkbox>
+                </div>
               </div>
             </div>
+          </el-tab-pane>
+        </el-tabs>
 
-            <div class="config-row">
-              <label>透明度</label>
-              <div class="range-group">
-                <el-slider
-                  v-model="textConfig.opacity"
-                  :min="0"
-                  :max="1"
-                  :step="0.1"
-                  style="flex: 1; margin-right: 10px"
-                />
-                <span class="value-display"
-                  >{{ (textConfig.opacity * 100).toFixed(0) }}%</span
-                >
-              </div>
-            </div>
-
-            <div class="config-row">
-              <label>水印位置</label>
-              <el-select v-model="textConfig.position" style="width: 100%">
-                <el-option label="左上" value="top-left" />
-                <el-option label="右上" value="top-right" />
-                <el-option label="左下" value="bottom-left" />
-                <el-option label="右下" value="bottom-right" />
-                <el-option label="中心" value="center" />
-              </el-select>
-            </div>
-
-            <div class="config-row">
-              <label>文字颜色</label>
-              <el-color-picker
-                v-model="textColor"
-                show-alpha
-                style="width: 100%"
-              />
-            </div>
-
-            <div class="config-row">
-              <label>X轴偏移 (px)</label>
-              <el-input-number
-                v-model="textConfig.offsetX"
-                :min="0"
-                :max="500"
-                style="width: 100%"
-              />
-            </div>
-
-            <div class="config-row">
-              <label>Y轴偏移 (px)</label>
-              <el-input-number
-                v-model="textConfig.offsetY"
-                :min="0"
-                :max="500"
-                style="width: 100%"
-              />
-            </div>
+        <!-- 导出设置 -->
+        <div class="config-section export-section">
+          <div class="section-heading"><span class="section-label">导出设置</span></div>
+          <div class="config-row">
+            <label>图片格式</label>
+            <el-select v-model="outputConfig.mimeType" size="small">
+              <el-option label="PNG（无损）" value="image/png" />
+              <el-option label="JPEG（白底）" value="image/jpeg" />
+              <el-option label="WebP" value="image/webp" />
+            </el-select>
           </div>
+          <div class="config-row">
+            <label>最长边（px，0 原图）</label>
+            <el-input-number v-model="outputConfig.maxSize" :min="0" :max="8192" :step="128" size="small" />
+          </div>
+          <details class="export-more">
+            <summary>更多设置</summary>
+            <div v-if="outputConfig.mimeType !== 'image/png'" class="config-row">
+              <label>质量 {{ Math.round(outputConfig.quality * 100) }}%</label>
+              <el-slider v-model="outputConfig.quality" :min="0.1" :max="1" :step="0.05" />
+            </div>
+            <div class="config-row">
+              <label>文件名（自动匹配后缀）</label>
+              <el-input v-model="outputConfig.filename" maxlength="120" size="small" placeholder="watermarked" />
+            </div>
+          </details>
+        </div>
+      </div>
 
-          <!-- 操作按钮 -->
-          <div class="action-buttons">
-            <el-button
-              type="primary"
-              @click="addTextWatermarkAction"
-              :loading="processing"
-              :disabled="!originalImage"
-            >
-              生成水印图片
-            </el-button>
-            <el-button @click="resetText">重置</el-button>
+      <!-- 右侧预览与下载 -->
+      <div class="preview-section">
+        <div class="preview-heading">
+          <span class="section-label">实时预览</span>
+          <span class="preview-status">{{ processing ? "更新中…" : (watermarkedImage ? "已更新" : "等待选择图片") }}</span>
+        </div>
+        <div class="preview-canvas">
+          <img
+            v-if="activeTab === 'text' ? originalImage : originalImageTiled"
+            :src="watermarkedImage || (activeTab === 'text' ? originalImage : originalImageTiled)"
+            class="preview-image"
+            alt="图片水印实时预览"
+          />
+          <div v-else class="preview-empty">选择图片后显示水印效果</div>
+        </div>
+        <div class="preview-footer">
+          <span class="export-summary">
+            {{ { "image/png": "PNG", "image/jpeg": "JPEG", "image/webp": "WebP" }[outputConfig.mimeType] }}
+            · {{ outputConfig.maxSize ? "最长边 " + outputConfig.maxSize + "px" : "原图尺寸" }}
+          </span>
+          <div class="download-buttons">
+            <el-button size="small" @click="copyImageUrl" :disabled="!watermarkedImage || processing">复制图片 URL</el-button>
+            <el-button type="primary" size="small" @click="downloadImage" :disabled="!watermarkedImage || processing">下载图片</el-button>
           </div>
         </div>
-      </el-tab-pane>
-
-      <!-- 平铺水印 -->
-      <el-tab-pane label="平铺水印" name="tiled">
-        <div class="tab-content">
-          <!-- 上传区域 -->
-          <div class="upload-section">
-            <label class="section-label">1. 选择图片</label>
-            <div
-              class="upload-area"
-              @dragover.prevent
-              @drop.prevent="handleDropTiled"
-            >
-              <input
-                ref="fileInputTiled"
-                type="file"
-                accept="image/*"
-                style="display: none"
-                @change="handleImageUploadTiled"
-              />
-              <button class="upload-btn" @click="fileInputTiled?.click()">
-                <el-icon><upload-filled /></el-icon>
-                <div>
-                  拖拽图片到此或<em style="color: #409eff">点击上传</em>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- 原始图片预览 -->
-          <div v-if="originalImageTiled" class="preview-section">
-            <label class="section-label">原始图片</label>
-            <img :src="originalImageTiled" class="preview-image" />
-          </div>
-
-          <!-- 平铺水印配置 -->
-          <div class="config-section">
-            <label class="section-label">2. 水印配置</label>
-
-            <div class="config-row">
-              <label>水印文字</label>
-              <el-input v-model="tiledConfig.text" placeholder="输入水印文字" />
-            </div>
-
-            <div class="config-row">
-              <label>字体大小</label>
-              <div class="range-group">
-                <el-slider
-                  v-model="tiledConfig.fontSize"
-                  :min="15"
-                  :max="80"
-                  style="flex: 1; margin-right: 10px"
-                />
-                <span class="value-display">{{ tiledConfig.fontSize }}px</span>
-              </div>
-            </div>
-
-            <div class="config-row">
-              <label>透明度</label>
-              <div class="range-group">
-                <el-slider
-                  v-model="tiledConfig.opacity"
-                  :min="0"
-                  :max="1"
-                  :step="0.1"
-                  style="flex: 1; margin-right: 10px"
-                />
-                <span class="value-display"
-                  >{{ (tiledConfig.opacity * 100).toFixed(0) }}%</span
-                >
-              </div>
-            </div>
-
-            <div class="config-row">
-              <label>旋转角度</label>
-              <div class="range-group">
-                <el-slider
-                  v-model="tiledConfig.angle"
-                  :min="-90"
-                  :max="90"
-                  style="flex: 1; margin-right: 10px"
-                />
-                <span class="value-display">{{ tiledConfig.angle }}°</span>
-              </div>
-            </div>
-
-            <div class="config-row">
-              <label>水印间距 (px)</label>
-              <el-input-number
-                v-model="tiledConfig.spacing"
-                :min="30"
-                :max="300"
-                style="width: 100%"
-              />
-            </div>
-
-            <div class="config-row">
-              <label>文字颜色</label>
-              <el-color-picker
-                v-model="tiledColor"
-                show-alpha
-                style="width: 100%"
-              />
-            </div>
-          </div>
-
-          <!-- 操作按钮 -->
-          <div class="action-buttons">
-            <el-button
-              type="primary"
-              @click="addTiledWatermarkAction"
-              :loading="processing"
-              :disabled="!originalImageTiled"
-            >
-              生成水印图片
-            </el-button>
-            <el-button @click="resetTiled">重置</el-button>
-          </div>
-        </div>
-      </el-tab-pane>
-    </el-tabs>
-
-    <!-- 预览和下载区域 -->
-    <div v-if="watermarkedImage" class="result-section">
-      <label class="section-label">3. 处理结果</label>
-      <img :src="watermarkedImage" class="result-image" />
-      <div class="download-buttons">
-        <el-button type="success" @click="downloadImage">
-          💾 下载图片
-        </el-button>
-        <el-button type="info" @click="copyImageUrl">
-          📋 复制图片 URL
-        </el-button>
       </div>
     </div>
 
@@ -293,7 +362,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { UploadFilled } from "@element-plus/icons-vue";
 import {
@@ -311,36 +380,256 @@ const showLoadingDialog = ref(false);
 const originalImage = ref("");
 const originalImageTiled = ref("");
 const watermarkedImage = ref("");
+const imageName = ref("");
+const imageNameTiled = ref("");
 const fileInput = ref(null);
 const fileInputTiled = ref(null);
+const imageReaders = new Map();
+let previewTimer;
+let renderVersion = 0;
 
 // 文字水印配置
-const textConfig = ref({
-  text: "© 2026 Company",
-  fontSize: 30,
-  opacity: 0.5,
-  position: "bottom-right",
+const defaultTextConfig = {
+  text: "仅供学习使用",
+  fontSize: 48,
+  opacity: 0.85,
+  position: "center",
   offsetX: 10,
   offsetY: 10,
-});
+  sizeMode: "relative",
+  fontSizeRatio: 0.08,
+  marginXRatio: 0.025,
+  marginYRatio: 0.025,
+  outline: true,
+  shadow: false,
+  background: false,
+};
+const textConfig = ref({ ...defaultTextConfig });
 
-const textColor = ref("rgba(255,255,255,0.5)");
+const textColor = ref("#b42318");
 
 // 平铺水印配置
-const tiledConfig = ref({
-  text: "Confidential",
+const defaultTiledConfig = {
+  text: "仅供学习使用",
   fontSize: 40,
-  opacity: 0.2,
-  angle: -45,
-  spacing: 100,
+  opacity: 0.55,
+  angle: -30,
+  spacing: 80,
+  sizeMode: "relative",
+  fontSizeRatio: 0.06,
+  spacingRatio: 0.15,
+  outline: true,
+  shadow: false,
+  background: false,
+};
+const tiledConfig = ref({ ...defaultTiledConfig });
+
+const tiledColor = ref("#b42318");
+
+// 导出设置
+const defaultOutputConfig = {
+  mimeType: "image/png",
+  quality: 0.92,
+  maxSize: 0,
+  filename: "watermarked",
+};
+const outputConfig = ref({ ...defaultOutputConfig });
+
+// 常用模板只保存配置，不保存图片和临时地址。
+const templateStorageKey = "image-watermark-templates-v1";
+const savedTemplates = ref([]);
+const selectedTemplate = ref("");
+const templateName = ref("");
+const templateInput = ref(null);
+let templateImportVersion = 0;
+
+const validateTemplate = (value) => {
+  if (
+    !value || value.version !== 1 || !["text", "tiled"].includes(value.mode) ||
+    !value.config || typeof value.config !== "object" || Array.isArray(value.config) ||
+    !value.output || typeof value.output !== "object" || Array.isArray(value.output)
+  ) {
+    throw new Error("模板格式不正确或版本不支持");
+  }
+
+  const config = { ...(value.mode === "text" ? defaultTextConfig : defaultTiledConfig) };
+  for (const key of Object.keys(config)) {
+    if (Object.prototype.hasOwnProperty.call(value.config, key)) config[key] = value.config[key];
+  }
+  const ranges = {
+    fontSize: value.mode === "text" ? [10, 100] : [15, 80],
+    opacity: [0, 1], fontSizeRatio: [0.01, 0.3],
+    offsetX: [0, 500], offsetY: [0, 500],
+    marginXRatio: [0, 0.3], marginYRatio: [0, 0.3],
+    angle: [-90, 90], spacing: [30, 300], spacingRatio: [0.02, 1],
+  };
+  for (const [key, [min, max]] of Object.entries(ranges)) {
+    if (key in config && (!Number.isFinite(config[key]) || config[key] < min || config[key] > max)) {
+      throw new Error("模板中的字号、透明度或位置参数不正确");
+    }
+  }
+  if (
+    typeof config.text !== "string" || !config.text.trim() || config.text.length > 80 ||
+    !["relative", "pixel"].includes(config.sizeMode) ||
+    ["outline", "shadow", "background"].some((key) => typeof config[key] !== "boolean") ||
+    (value.mode === "text" && !["top-left", "top-right", "bottom-left", "bottom-right", "center"].includes(config.position))
+  ) {
+    throw new Error("模板中的水印配置不正确");
+  }
+  if (
+    typeof value.color !== "string" || value.color.length > 64 ||
+    !/^(#[\da-f]{3}|#[\da-f]{4}|#[\da-f]{6}|#[\da-f]{8}|rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*[\d.]+)?\s*\))$/i.test(value.color) ||
+    (typeof CSS !== "undefined" && !CSS.supports("color", value.color))
+  ) {
+    throw new Error("模板中的颜色不正确");
+  }
+
+  const output = { ...defaultOutputConfig };
+  for (const key of Object.keys(output)) {
+    if (Object.prototype.hasOwnProperty.call(value.output, key)) output[key] = value.output[key];
+  }
+  if (
+    !["image/png", "image/jpeg", "image/webp"].includes(output.mimeType) ||
+    !Number.isFinite(output.quality) || output.quality < 0 || output.quality > 1 ||
+    !Number.isFinite(output.maxSize) || output.maxSize < 0 || output.maxSize > 8192 ||
+    typeof output.filename !== "string" || output.filename.length > 120
+  ) {
+    throw new Error("模板中的导出设置不正确");
+  }
+  return { version: 1, mode: value.mode, config, color: value.color, output };
+};
+
+const getCurrentTemplate = () => validateTemplate({
+  version: 1,
+  mode: activeTab.value,
+  config: activeTab.value === "text" ? textConfig.value : tiledConfig.value,
+  color: activeTab.value === "text" ? textColor.value : tiledColor.value,
+  output: outputConfig.value,
 });
 
-const tiledColor = ref("rgba(150,150,150,0.3)");
+const applyTemplate = (value) => {
+  const template = validateTemplate(value);
+  templateImportVersion += 1;
+  if (template.mode === "text") {
+    textConfig.value = template.config;
+    textColor.value = template.color;
+  } else {
+    tiledConfig.value = template.config;
+    tiledColor.value = template.color;
+  }
+  outputConfig.value = template.output;
+  activeTab.value = template.mode;
+};
+
+const loadTemplates = () => {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const stored = localStorage.getItem(templateStorageKey);
+    if (!stored) return;
+    if (stored.length > 256 * 1024) throw new Error("模板数据过大");
+    const list = JSON.parse(stored);
+    if (!Array.isArray(list) || list.length > 50) throw new Error("模板列表格式不正确");
+    const ids = new Set();
+    const templates = list.map((item) => {
+      if (!item || typeof item.id !== "string" || !item.id || ids.has(item.id) || typeof item.name !== "string" || !item.name.trim() || item.name.length > 24) {
+        throw new Error("模板名称或编号不正确");
+      }
+      ids.add(item.id);
+      return { ...validateTemplate(item), id: item.id, name: item.name };
+    });
+    savedTemplates.value = templates;
+  } catch (error) {
+    ElMessage.warning("本地模板读取失败，可重新导入模板");
+  }
+};
+
+const applySavedTemplate = (id) => {
+  const template = savedTemplates.value.find((item) => item.id === id);
+  if (!template) {
+    templateName.value = "";
+    return;
+  }
+  try {
+    applyTemplate(template);
+    templateName.value = template.name;
+  } catch (error) {
+    ElMessage.error(error.message);
+  }
+};
+
+const saveTemplate = () => {
+  const name = templateName.value.trim();
+  if (!name || name.length > 24) return ElMessage.warning("请输入 1-24 字的模板名称");
+  try {
+    const id = selectedTemplate.value || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    if (savedTemplates.value.some((item) => item.name === name && item.id !== id)) {
+      throw new Error("已有同名模板，请先选择后覆盖保存");
+    }
+    const next = savedTemplates.value.filter((item) => item.id !== id);
+    next.push({ ...getCurrentTemplate(), id, name });
+    if (next.length > 50) throw new Error("最多保存 50 个常用模板");
+    localStorage.setItem(templateStorageKey, JSON.stringify(next));
+    savedTemplates.value = next;
+    selectedTemplate.value = id;
+    ElMessage.success("模板已保存到当前浏览器");
+  } catch (error) {
+    ElMessage.error("模板保存失败：" + error.message);
+  }
+};
+
+const deleteTemplate = () => {
+  if (!selectedTemplate.value) return;
+  try {
+    const next = savedTemplates.value.filter((item) => item.id !== selectedTemplate.value);
+    localStorage.setItem(templateStorageKey, JSON.stringify(next));
+    savedTemplates.value = next;
+    selectedTemplate.value = "";
+    templateName.value = "";
+    ElMessage.success("模板已删除");
+  } catch (error) {
+    ElMessage.error("模板删除失败：" + error.message);
+  }
+};
+
+const exportTemplate = () => {
+  try {
+    const blob = new Blob([JSON.stringify(getCurrentTemplate(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const name = (templateName.value.trim() || "watermark-template").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_");
+    try {
+      downloadWatermarkedImage(url, `${name}.json`);
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  } catch (error) {
+    ElMessage.error("模板导出失败：" + error.message);
+  }
+};
+
+const importTemplate = async (event) => {
+  const [file] = event.target.files || [];
+  const requestVersion = ++templateImportVersion;
+  event.target.value = "";
+  if (!file) return;
+  try {
+    if (file.size > 32 * 1024) throw new Error("请选择 32KB 以内的 JSON 模板");
+    const content = await file.text();
+    if (requestVersion !== templateImportVersion) return;
+    applyTemplate(JSON.parse(content));
+    selectedTemplate.value = "";
+    templateName.value = file.name.replace(/\.json$/i, "").slice(0, 24);
+    ElMessage.success("模板已应用，可保存到常用模板");
+  } catch (error) {
+    if (requestVersion === templateImportVersion) ElMessage.error("模板导入失败：" + error.message);
+  }
+};
+
+loadTemplates();
 
 // 处理图片上传
-const revokeWatermarkedImage = () => {
-  if (watermarkedImage.value?.startsWith("blob:")) {
-    URL.revokeObjectURL(watermarkedImage.value);
+const revokeWatermarkedImage = (image = watermarkedImage.value) => {
+  if (image?.startsWith("blob:")) {
+    URL.revokeObjectURL(image);
   }
 };
 
@@ -354,10 +643,25 @@ const readImageFile = (file, targetRef) => {
     return;
   }
 
+  imageReaders.get(targetRef)?.abort();
   const reader = new FileReader();
+  imageReaders.set(targetRef, reader);
+  targetRef.value = "";
+  const filenameRef = targetRef === originalImage ? imageName : imageNameTiled;
+  filenameRef.value = "";
   reader.onload = (e) => {
+    if (imageReaders.get(targetRef) !== reader) {
+      return;
+    }
+    imageReaders.delete(targetRef);
     targetRef.value = e.target?.result || "";
-    setWatermarkedImage("");
+    filenameRef.value = file.name || "";
+  };
+  reader.onerror = () => {
+    if (imageReaders.get(targetRef) === reader) {
+      imageReaders.delete(targetRef);
+      ElMessage.error("图片读取失败，请重新选择");
+    }
   };
   reader.readAsDataURL(file);
 };
@@ -383,84 +687,140 @@ const handleDropTiled = (event) => {
 };
 
 // 添加文字水印
-const addTextWatermarkAction = async () => {
+const addTextWatermarkAction = async (automatic = false) => {
+  clearTimeout(previewTimer);
+  const requestVersion = ++renderVersion;
   if (!originalImage.value) {
-    ElMessage.error("请先选择图片");
+    if (!automatic) ElMessage.error("请先选择图片");
     return;
   }
 
   processing.value = true;
-  showLoadingDialog.value = true;
+  showLoadingDialog.value = !automatic;
 
   try {
-    setWatermarkedImage(await addTextWatermark(originalImage.value, {
-      text: textConfig.value.text,
-      fontSize: textConfig.value.fontSize,
-      opacity: textConfig.value.opacity,
-      position: textConfig.value.position,
+    const result = await addTextWatermark(originalImage.value, {
+      ...textConfig.value,
+      ...outputConfig.value,
       textColor: textColor.value,
-      offsetX: textConfig.value.offsetX,
-      offsetY: textConfig.value.offsetY,
-    }));
+    });
+    if (requestVersion !== renderVersion) {
+      revokeWatermarkedImage(result);
+      return;
+    }
+    setWatermarkedImage(result);
 
-    ElMessage.success("水印添加成功！");
+    if (!automatic) ElMessage.success("水印添加成功！");
   } catch (error) {
-    ElMessage.error("处理失败: " + error.message);
-    console.error(error);
+    if (requestVersion === renderVersion) {
+      setWatermarkedImage("");
+      ElMessage.error("处理失败: " + error.message);
+      console.error(error);
+    }
   } finally {
-    processing.value = false;
-    showLoadingDialog.value = false;
+    if (requestVersion === renderVersion) {
+      processing.value = false;
+      showLoadingDialog.value = false;
+    }
   }
 };
 
 // 添加平铺水印
-const addTiledWatermarkAction = async () => {
+const addTiledWatermarkAction = async (automatic = false) => {
+  clearTimeout(previewTimer);
+  const requestVersion = ++renderVersion;
   if (!originalImageTiled.value) {
-    ElMessage.error("请先选择图片");
+    if (!automatic) ElMessage.error("请先选择图片");
     return;
   }
 
   processing.value = true;
-  showLoadingDialog.value = true;
+  showLoadingDialog.value = !automatic;
 
   try {
-    setWatermarkedImage(await addTiledWatermark(originalImageTiled.value, {
-      text: tiledConfig.value.text,
-      fontSize: tiledConfig.value.fontSize,
-      opacity: tiledConfig.value.opacity,
-      angle: tiledConfig.value.angle,
-      spacing: tiledConfig.value.spacing,
+    const result = await addTiledWatermark(originalImageTiled.value, {
+      ...tiledConfig.value,
+      ...outputConfig.value,
       textColor: tiledColor.value,
-    }));
+    });
+    if (requestVersion !== renderVersion) {
+      revokeWatermarkedImage(result);
+      return;
+    }
+    setWatermarkedImage(result);
 
-    ElMessage.success("水印添加成功！");
+    if (!automatic) ElMessage.success("水印添加成功！");
   } catch (error) {
-    ElMessage.error("处理失败: " + error.message);
-    console.error(error);
+    if (requestVersion === renderVersion) {
+      setWatermarkedImage("");
+      ElMessage.error("处理失败: " + error.message);
+      console.error(error);
+    }
   } finally {
-    processing.value = false;
-    showLoadingDialog.value = false;
+    if (requestVersion === renderVersion) {
+      processing.value = false;
+      showLoadingDialog.value = false;
+    }
   }
 };
 
+// 配置变化后合并连续输入，只接收当前模式和最新配置对应的结果。
+watch(
+  () => [
+    activeTab.value,
+    activeTab.value === "text" ? originalImage.value : originalImageTiled.value,
+    activeTab.value === "text" ? textConfig.value : tiledConfig.value,
+    activeTab.value === "text" ? textColor.value : tiledColor.value,
+    outputConfig.value.mimeType,
+    outputConfig.value.quality,
+    outputConfig.value.maxSize,
+  ],
+  ([mode, image], previous = []) => {
+    renderVersion += 1;
+    clearTimeout(previewTimer);
+    showLoadingDialog.value = false;
+    if (mode !== previous[0] || image !== previous[1]) {
+      setWatermarkedImage("");
+    }
+    processing.value = Boolean(image);
+    if (!image) return;
+    previewTimer = setTimeout(() => {
+      if (mode === "text") {
+        addTextWatermarkAction(true);
+      } else {
+        addTiledWatermarkAction(true);
+      }
+    }, 150);
+  },
+  { deep: true, flush: "sync" },
+);
+
 // 下载图片
+const getDownloadFilename = () => {
+  const extension = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" }[outputConfig.value.mimeType];
+  const name = String(outputConfig.value.filename || "watermarked")
+    .trim()
+    .replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_")
+    .replace(/\.(png|jpe?g|webp|gif)$/i, "")
+    .replace(/[.\s]+$/g, "")
+    .trim() || "watermarked";
+  return `${name}.${extension}`;
+};
+
 const downloadImage = () => {
+  if (processing.value) return;
   if (!watermarkedImage.value) {
     ElMessage.error("没有可下载的图片");
     return;
   }
 
-  const filename =
-    activeTab.value === "text"
-      ? `watermarked-text-${Date.now()}.png`
-      : `watermarked-tiled-${Date.now()}.png`;
-
-  downloadWatermarkedImage(watermarkedImage.value, filename);
+  downloadWatermarkedImage(watermarkedImage.value, getDownloadFilename());
   ElMessage.success("正在下载...");
 };
 
 // 复制图片 URL
 const copyImageUrl = () => {
+  if (processing.value) return;
   if (!watermarkedImage.value) {
     ElMessage.error("没有可复制的图片");
     return;
@@ -478,180 +838,464 @@ const copyImageUrl = () => {
 
 // 重置表单
 const resetText = () => {
+  templateImportVersion += 1;
+  imageReaders.get(originalImage)?.abort();
+  imageReaders.delete(originalImage);
   originalImage.value = "";
+  imageName.value = "";
   setWatermarkedImage("");
   if (fileInput.value) {
     fileInput.value.value = "";
   }
-  textConfig.value = {
-    text: "© 2026 Company",
-    fontSize: 30,
-    opacity: 0.5,
-    position: "bottom-right",
-    offsetX: 10,
-    offsetY: 10,
-  };
-  textColor.value = "rgba(255,255,255,0.5)";
+  textConfig.value = { ...defaultTextConfig };
+  textColor.value = "#b42318";
+  selectedTemplate.value = "";
+  templateName.value = "";
 };
 
 const resetTiled = () => {
+  templateImportVersion += 1;
+  imageReaders.get(originalImageTiled)?.abort();
+  imageReaders.delete(originalImageTiled);
   originalImageTiled.value = "";
+  imageNameTiled.value = "";
   setWatermarkedImage("");
   if (fileInputTiled.value) {
     fileInputTiled.value.value = "";
   }
-  tiledConfig.value = {
-    text: "Confidential",
-    fontSize: 40,
-    opacity: 0.2,
-    angle: -45,
-    spacing: 100,
-  };
-  tiledColor.value = "rgba(150,150,150,0.3)";
+  tiledConfig.value = { ...defaultTiledConfig };
+  tiledColor.value = "#b42318";
+  selectedTemplate.value = "";
+  templateName.value = "";
 };
 
 onBeforeUnmount(() => {
+  templateImportVersion += 1;
+  renderVersion += 1;
+  clearTimeout(previewTimer);
+  imageReaders.forEach((reader) => reader.abort());
+  imageReaders.clear();
   revokeWatermarkedImage();
 });
 </script>
 
 <style scoped lang="scss">
 .watermark-container {
-  padding: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+  background: #f1f5f9;
 
   .section-title {
-    text-align: center;
-    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    gap: 8px 16px;
     color: #303133;
 
     h2 {
-      font-size: 28px;
-      font-weight: 600;
       margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 32px;
     }
   }
 
-  .tabs {
-    margin-bottom: 20px;
+  .template-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    :deep(.el-select) {
+      width: 160px;
+    }
+    :deep(.el-button) {
+      margin-left: 0;
+    }
+    :deep(.el-input),
+    :deep(.el-input__inner) {
+      height: 28px;
+      min-height: 28px;
+      line-height: 28px;
+    }
   }
 
-  .tab-content {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
+  .workspace-layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    flex: 1;
+    min-height: 0;
+    gap: 16px;
+  }
+
+  .settings-panel {
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+  }
+
+  .tabs {
+    margin: 0;
+    :deep(.el-tabs__header) {
+      margin: 0 0 8px;
+    }
+    :deep(.el-tabs__item) {
+      height: 30px;
+      line-height: 30px;
+    }
+    :deep(.el-tabs__content) {
+      overflow: visible;
+    }
+  }
+
+  .mode-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .section-label {
     display: block;
-    font-size: 14px;
+    margin: 0;
+    font-size: 13px;
     font-weight: 600;
+    line-height: 20px;
     color: #303133;
-    margin-bottom: 12px;
   }
 
-  .upload-section {
-    margin-bottom: 30px;
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
-    .upload-area {
-      border: 2px dashed #409eff;
-      border-radius: 6px;
-      overflow: hidden;
+  .upload-area {
+    overflow: hidden;
+    border: 1px dashed #91bbf2;
+    border-radius: 6px;
+    background: #f8fbff;
 
-      :deep(.el-upload-dragger) {
-        border: none;
-        padding: 40px 20px;
-
-        .el-icon--upload {
-          font-size: 48px;
-          color: #409eff;
-          margin-bottom: 10px;
-        }
-
-        .el-upload__text {
-          font-size: 14px;
-          color: #606266;
-        }
-      }
+    .upload-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 34px;
+      padding: 6px 10px;
+      border: none;
+      background: transparent;
+      color: #606266;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
     }
-  }
 
-  .preview-section {
-    margin-bottom: 30px;
+    .upload-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-    .preview-image {
-      max-width: 100%;
-      max-height: 400px;
-      border-radius: 6px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    em {
+      flex-shrink: 0;
+      color: #409eff;
+      font-style: normal;
+    }
+    .el-upload__tip {
+      padding: 0 8px 4px;
+      font-size: 11px;
+      line-height: 15px;
+      color: #909399;
     }
   }
 
   .config-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
     background: #f5f7fa;
     border-radius: 6px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 10px;
+
+    .section-heading,
+    .config-row.full-row {
+      grid-column: 1 / -1;
+    }
+
+    .section-label {
+      margin-bottom: 0;
+    }
 
     .config-row {
-      margin-bottom: 16px;
+      min-width: 0;
+      margin-bottom: 0;
 
       label {
         display: block;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
+        line-height: 16px;
         color: #606266;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+      }
+
+      .config-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 16px;
+        margin-bottom: 4px;
+        color: #606266;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 16px;
+
+        :deep(.el-checkbox) {
+          height: 16px;
+          margin-right: 0;
+        }
+
+        :deep(.el-checkbox__label) {
+          padding-left: 4px;
+          font-size: 12px;
+        }
       }
 
       .range-group {
         display: flex;
         align-items: center;
+        height: 28px;
+
+        :deep(.el-slider) {
+          min-width: 0;
+        }
 
         .value-display {
           display: inline-block;
-          min-width: 50px;
+          min-width: 34px;
+          font-size: 12px;
           text-align: right;
           font-weight: 500;
           color: #409eff;
         }
       }
     }
-  }
 
+    :deep(.el-input),
+    :deep(.el-input__inner),
+    :deep(.el-input-number),
+    :deep(.el-select),
+    :deep(.el-color-picker) {
+      height: 28px;
+      min-height: 28px;
+      line-height: 28px;
+    }
+
+    :deep(.el-input-number) {
+      line-height: 30px;
+    }
+
+    :deep(.el-color-picker__trigger) {
+      height: 28px;
+    }
+
+    .effect-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      :deep(.el-checkbox) {
+        height: 24px;
+        margin-right: 0;
+      }
+
+      :deep(.el-checkbox__label) {
+        padding-left: 6px;
+        font-size: 12px;
+      }
+    }
+  }
   .action-buttons {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-
+    gap: 6px;
     :deep(.el-button) {
-      flex: 1;
+      height: 20px;
+      min-height: 20px;
+      margin: 0;
+      padding: 0 2px;
+      font-size: 12px;
     }
   }
 
-  .result-section {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-
-    .result-image {
-      max-width: 100%;
-      max-height: 600px;
-      border-radius: 6px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-      margin: 15px 0;
+  .export-section {
+    margin-top: 8px;
+    background: #ffffff;
+    border: 1px solid #e5eaf1;
+    :deep(.el-select),
+    :deep(.el-input-number) {
+      width: 100%;
     }
+  }
 
+  .export-more {
+    grid-column: 1 / -1;
+    min-width: 0;
+    font-size: 12px;
+    summary {
+      cursor: pointer;
+      color: #64748b;
+      line-height: 22px;
+    }
+    .config-row {
+      margin-top: 8px;
+    }
+    :deep(.el-slider) {
+      margin: 0 8px;
+    }
+  }
+
+  .preview-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .preview-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .preview-status, .export-summary {
+    color: #8492a6;
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .preview-canvas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 12px;
+    background: #f8fafc;
+  }
+
+  .preview-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+  }
+
+  .preview-empty {
+    padding: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .preview-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 64px 10px 12px;
+    border-top: 1px solid #e8edf3;
+    background: #ffffff;
+  }
+
+  .download-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    :deep(.el-button) {
+      height: 32px;
+      min-height: 32px;
+      margin: 0;
+    }
+  }
+}
+
+.template-manager {
+  display: grid;
+  gap: 10px;
+  font-size: 12px;
+  .manager-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  :deep(.el-button) {
+    margin: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .watermark-container {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+    .workspace-layout {
+      grid-template-columns: minmax(0, 1fr);
+      flex: none;
+    }
+    .settings-panel {
+      overflow: visible;
+      padding-right: 0;
+    }
+    .preview-section {
+      height: clamp(320px, 65vh, 520px);
+    }
+    .template-toolbar {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .watermark-container {
+    .config-section {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .template-toolbar {
+      width: 100%;
+    }
+    .template-toolbar :deep(.el-select) {
+      flex: 1;
+      min-width: 0;
+    }
     .download-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-
-      :deep(.el-button) {
-        min-width: 150px;
-      }
+      flex-wrap: wrap;
     }
   }
 }

@@ -15,30 +15,107 @@
  * @param {string} options.position - 位置，默认 'bottom-right'（top-left, top-right, bottom-left, bottom-right, center）
  * @param {number} options.offsetX - X轴偏移，默认 10
  * @param {number} options.offsetY - Y轴偏移，默认 10
- * @returns {Promise<string>} - 返回 base64 或 blob URL
+ * @param {string} options.sizeMode - pixel（兼容旧参数）或 relative（按最终图片短边计算）
+ * @param {number} options.fontSizeRatio - 相对字号，默认 0.08
+ * @param {number} options.marginXRatio - 相对水平边距，默认 0.025
+ * @param {number} options.marginYRatio - 相对垂直边距，默认 0.025
+ * @param {boolean} options.outline - 白色描边，默认 false
+ * @param {boolean} options.shadow - 轻阴影，默认 false
+ * @param {boolean} options.background - 半透明底色，默认 false
+ * @param {string} options.mimeType - image/png、image/jpeg 或 image/webp，默认 image/png
+ * @param {number} options.quality - 编码质量，默认 0.92
+ * @param {number} options.maxSize - 最长边限制，0 保留原尺寸，默认 0
+ * @returns {Promise<string>} - 返回 blob URL
  */
-function parseColorAlpha(color) {
-  if (typeof color !== "string") {
-    return 1;
-  }
-
-  const rgbaMatch = color.match(
-    /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i,
-  );
-  if (rgbaMatch) {
-    return Number(rgbaMatch[1]);
-  }
-
-  const hexMatch = color.match(/^#([0-9a-f]{8})$/i);
-  if (hexMatch) {
-    return Number.parseInt(hexMatch[1].slice(6, 8), 16) / 255;
-  }
-
-  return 1;
+function watermarkNumber(value, fallback, min = 0, max = Infinity) {
+  const number = Number(value);
+  return Math.max(min, Math.min(max, Number.isFinite(number) ? number : fallback));
 }
 
-function getFinalAlpha(color, opacity) {
-  return Math.max(0, Math.min(1, parseColorAlpha(color) * opacity));
+function createWatermarkCanvas(img, options) {
+  const mimeType = options.mimeType ?? "image/png";
+  if (!["image/png", "image/jpeg", "image/webp"].includes(mimeType)) {
+    throw new Error("Unsupported image encoding format");
+  }
+
+  const width = img.naturalWidth || img.width;
+  const height = img.naturalHeight || img.height;
+  if (!width || !height) throw new Error("Failed to decode image dimensions");
+  const maxSize = watermarkNumber(options.maxSize, 0);
+  const scale = maxSize > 0 ? Math.min(1, Math.max(1, maxSize) / Math.max(width, height)) : 1;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context is unavailable");
+
+  // JPEG 不支持透明，先铺白底，避免透明区域被编码为黑色。
+  if (mimeType === "image/jpeg") {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return { canvas, ctx, mimeType };
+}
+
+function measureWatermark(ctx, text, fontSize, fontFamily, options, maxWidth, maxHeight) {
+  let size = Math.max(0.01, fontSize);
+  for (let attempt = 0; attempt < 6; attempt++) {
+    ctx.font = `${size}px ${fontFamily}`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    const metrics = ctx.measureText(text);
+    const left = metrics.actualBoundingBoxLeft || 0;
+    const textWidth = Math.max(0, left + (metrics.actualBoundingBoxRight ?? metrics.width));
+    const ascent = metrics.actualBoundingBoxAscent ?? size;
+    const textHeight = Math.max(ascent + (metrics.actualBoundingBoxDescent || 0), size * 0.01);
+    const lineWidth = options.outline ? size * 0.06 : 0;
+    const padding = Math.max(options.background ? size * 0.2 : 0, lineWidth / 2 + (options.shadow ? size * 0.28 : 0));
+    const width = textWidth + padding * 2;
+    const height = textHeight + padding * 2;
+    const scale = Math.min(1, maxWidth / Math.max(width, 0.01), maxHeight / Math.max(height, 0.01));
+    if (scale >= 1) return { fontSize: size, left, ascent, textWidth, textHeight, padding, width, height, lineWidth };
+    size *= scale * 0.99;
+  }
+  throw new Error("Watermark text cannot fit within image bounds");
+}
+
+function drawWatermarkText(ctx, text, x, y, layout, options, textColor) {
+  const { fontSize, padding, left, ascent, textWidth, textHeight, lineWidth } = layout;
+  if (options.background) {
+    const inset = fontSize * 0.2;
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillRect(x + padding - inset, y + padding - inset, textWidth + inset * 2, textHeight + inset * 2);
+  }
+  ctx.save();
+  if (options.shadow) {
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = fontSize * 0.12;
+    ctx.shadowOffsetY = fontSize * 0.04;
+  }
+  const textX = x + padding + left;
+  const textY = y + padding + ascent;
+  if (options.outline) {
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
+    ctx.strokeText(text, textX, textY);
+  }
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, textX, textY);
+  ctx.restore();
+}
+
+function exportWatermark(canvas, mimeType, options, resolve, reject) {
+  canvas.toBlob((blob) => {
+    try {
+      if (!blob) throw new Error("Failed to encode image blob");
+      if (blob.type !== mimeType) throw new Error(`Image encoding format is not supported: ${mimeType}`);
+      resolve(URL.createObjectURL(blob));
+    } catch (error) {
+      reject(error);
+    }
+  }, mimeType, watermarkNumber(options.quality, 0.92, 0, 1));
 }
 
 export function addTextWatermark(imageSrc, options = {}) {
@@ -58,61 +135,45 @@ export function addTextWatermark(imageSrc, options = {}) {
     img.crossOrigin = "anonymous";
 
     img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      try {
+        const { canvas, ctx, mimeType } = createWatermarkCanvas(img, options);
+        const shortSide = Math.min(canvas.width, canvas.height);
+        const relative = options.sizeMode === "relative";
+        const marginX = Math.min(relative ? shortSide * watermarkNumber(options.marginXRatio, 0.025) : watermarkNumber(offsetX, 10), (canvas.width - 1) / 2);
+        const marginY = Math.min(relative ? shortSide * watermarkNumber(options.marginYRatio, 0.025) : watermarkNumber(offsetY, 10), (canvas.height - 1) / 2);
+        const size = relative ? shortSide * watermarkNumber(options.fontSizeRatio, 0.08) : watermarkNumber(fontSize, 20);
+        const label = String(text);
+        const layout = measureWatermark(ctx, label, size, fontFamily, options, canvas.width - marginX * 2, canvas.height - marginY * 2);
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      // 绘制原始图片
-      ctx.drawImage(img, 0, 0);
-
-      // 设置水印样式
-      ctx.globalAlpha = getFinalAlpha(textColor, opacity);
-      ctx.fillStyle = textColor;
-      ctx.font = `${fontSize}px ${fontFamily}`;
-      ctx.textBaseline = "bottom";
-
-      // 计算水印位置
-      const textMetrics = ctx.measureText(text);
-      const textWidth = textMetrics.width;
-      const textHeight = fontSize;
-
-      let x, y;
-      switch (position) {
-        case "top-left":
-          x = offsetX;
-          y = textHeight + offsetY;
-          break;
-        case "top-right":
-          x = canvas.width - textWidth - offsetX;
-          y = textHeight + offsetY;
-          break;
-        case "bottom-left":
-          x = offsetX;
-          y = canvas.height - offsetY;
-          break;
-        case "bottom-right":
-          x = canvas.width - textWidth - offsetX;
-          y = canvas.height - offsetY;
-          break;
-        case "center":
-          x = (canvas.width - textWidth) / 2;
-          y = canvas.height / 2;
-          break;
-        default:
-          x = canvas.width - textWidth - offsetX;
-          y = canvas.height - offsetY;
+        // 颜色本身的 alpha 由 Canvas 处理，globalAlpha 只应用一次透明度。
+        ctx.globalAlpha = watermarkNumber(opacity, 0.5, 0, 1);
+        let x, y;
+        switch (position) {
+          case "top-left":
+            x = marginX;
+            y = marginY;
+            break;
+          case "top-right":
+            x = canvas.width - layout.width - marginX;
+            y = marginY;
+            break;
+          case "bottom-left":
+            x = marginX;
+            y = canvas.height - layout.height - marginY;
+            break;
+          case "center":
+            x = (canvas.width - layout.width) / 2;
+            y = (canvas.height - layout.height) / 2;
+            break;
+          default:
+            x = canvas.width - layout.width - marginX;
+            y = canvas.height - layout.height - marginY;
+        }
+        if (label) drawWatermarkText(ctx, label, x, y, layout, options, textColor);
+        exportWatermark(canvas, mimeType, options, resolve, reject);
+      } catch (error) {
+        reject(error);
       }
-
-      // 绘制水印
-      ctx.fillText(text, x, y);
-
-      // 返回结果
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        resolve(url);
-      }, "image/png");
     };
 
     img.onerror = () => {
@@ -133,6 +194,8 @@ export function addTextWatermark(imageSrc, options = {}) {
  * @param {number} options.opacity - 透明度
  * @param {number} options.angle - 旋转角度（度数），默认 -45
  * @param {number} options.spacing - 水印间距，默认 80
+ * @param {number} options.spacingRatio - 相对间距（最终图片短边比例），默认 0.15
+ * @param {string} options.sizeMode - pixel 或 relative，输出及效果选项与文字水印相同
  * @returns {Promise<string>}
  */
 export function addTiledWatermark(imageSrc, options = {}) {
@@ -151,51 +214,41 @@ export function addTiledWatermark(imageSrc, options = {}) {
     img.crossOrigin = "anonymous";
 
     img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      try {
+        const { canvas, ctx, mimeType } = createWatermarkCanvas(img, options);
+        const shortSide = Math.min(canvas.width, canvas.height);
+        const relative = options.sizeMode === "relative";
+        const size = relative ? shortSide * watermarkNumber(options.fontSizeRatio, 0.08) : watermarkNumber(fontSize, 30);
+        const gap = relative ? shortSide * watermarkNumber(options.spacingRatio, 0.15) : watermarkNumber(spacing, 80);
+        const label = String(text);
+        const layout = measureWatermark(ctx, label, size, fontFamily, options, canvas.width, canvas.height);
+        ctx.globalAlpha = watermarkNumber(opacity, 0.3, 0, 1);
+        let stepX = Math.max(layout.width + gap, 1);
+        let stepY = Math.max((relative ? layout.height : Math.max(layout.height, Math.ceil(layout.fontSize * 1.4))) + gap, 1);
+        const radians = (watermarkNumber(angle, -45, -360, 360) * Math.PI) / 180;
+        const extentX = (Math.abs(canvas.width * Math.cos(radians)) + Math.abs(canvas.height * Math.sin(radians))) / 2;
+        const extentY = (Math.abs(canvas.width * Math.sin(radians)) + Math.abs(canvas.height * Math.cos(radians))) / 2;
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      // 绘制原始图片
-      ctx.drawImage(img, 0, 0);
-
-      // 设置水印样式
-      ctx.globalAlpha = getFinalAlpha(textColor, opacity);
-      ctx.fillStyle = textColor;
-      ctx.font = `${fontSize}px ${fontFamily}`;
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
-
-      const textMetrics = ctx.measureText(text);
-      const textWidth = Math.ceil(textMetrics.width);
-      const textHeight = Math.ceil(fontSize * 1.4);
-      const stepX = Math.max(textWidth + spacing, spacing);
-      const stepY = Math.max(textHeight + spacing, spacing);
-
-      // 计算对角线长度
-      const diagonal = Math.sqrt(canvas.width ** 2 + canvas.height ** 2);
-
-      // 保存 canvas 状态
-      ctx.save();
-
-      // 旋转
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((angle * Math.PI) / 180);
-
-      // 平铺绘制水印
-      for (let x = -diagonal; x < diagonal; x += stepX) {
-        for (let y = -diagonal; y < diagonal; y += stepY) {
-          ctx.fillText(text, x, y);
+        // 极小字号/间距也限制绘制次数，避免平铺阻塞页面。
+        while (Math.ceil((extentX * 2) / stepX) * Math.ceil((extentY * 2) / stepY) > 4096) {
+          stepX *= 1.2;
+          stepY *= 1.2;
         }
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(radians);
+        if (label) {
+          for (let x = -extentX; x < extentX; x += stepX) {
+            for (let y = -extentY; y < extentY; y += stepY) {
+              drawWatermarkText(ctx, label, x, y, layout, options, textColor);
+            }
+          }
+        }
+        ctx.restore();
+        exportWatermark(canvas, mimeType, options, resolve, reject);
+      } catch (error) {
+        reject(error);
       }
-
-      ctx.restore();
-
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        resolve(url);
-      }, "image/png");
     };
 
     img.onerror = () => {

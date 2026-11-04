@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN node -v
 
 # 使用Yarn安装依赖
-RUN yarn install
+RUN npm ci --legacy-peer-deps
 
 # 复制其余的源代码
 COPY . .

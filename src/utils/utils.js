@@ -39,31 +39,33 @@ export default {
     return fmt;
   },
   generateRoute(menuList) {
-    let routes = [];
+    const routes = [];
     const deepList = (list) => {
-      list.forEach(item => {
-        // 确保 item 是一个对象  
-        if (typeof item !== 'object' || item === null) {
-          console.error('Invalid menu item:', item);
+      list.forEach((item) => {
+        if (!item || typeof item !== "object" || item.menuType !== 1) {
           return;
         }
-        const componentName = item.component || 'NotFound';
-        let route = {
-          name: item.name || componentName,
-          path: item.path,
-          meta: {
-            title: item.menuName || 'Untitled',
-          },
-          component: componentName,
-        };
-        if (item.children && Array.isArray(item.children)) {
-          route.children = [];
-          deepList(item.children, route.children);
+        const path = typeof item.path === "string" ? item.path.trim() : "";
+        const component =
+          typeof item.component === "string" ? item.component.trim() : "";
+        if (path && component) {
+          routes.push({
+            name: item.name || path,
+            path,
+            meta: {
+              title: item.menuName || "Untitled",
+            },
+            component,
+          });
         }
-        routes.push(route);
+        if (Array.isArray(item.children)) {
+          deepList(item.children);
+        }
       });
     };
-    deepList(menuList);
+    if (Array.isArray(menuList)) {
+      deepList(menuList);
+    }
     return routes;
   },
 };
