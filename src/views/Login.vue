@@ -2,7 +2,14 @@
   <div class="login-wrapper">
     <div class="title">基于Vue3的企业后台管理系统的设计与实现</div>
     <div class="modal">
-      <el-form ref="userFormRef" :model="user" status-icon :rules="rules">
+      <el-form
+        ref="userFormRef"
+        :model="user"
+        status-icon
+        :rules="rules"
+        :disabled="loggingIn"
+        @submit.prevent="login(userFormRef)"
+      >
         <el-form-item prop="userName">
           <el-input
             type="text"
@@ -34,8 +41,10 @@
         <el-form-item>
           <el-button
             type="primary"
+            native-type="submit"
             class="btn-login"
-            @click="login(userFormRef)"
+            :loading="loggingIn"
+            :disabled="loggingIn"
             >登录</el-button
           >
         </el-form-item>
@@ -80,34 +89,38 @@ let rules = {
   ],
 };
 const userFormRef = ref();
+const loggingIn = ref(false);
 const store = useStore();
 const router = useRouter();
 const captchaImage = ref(""); // 验证码地址
 onMounted(() => {
   refreshCaptcha();
 });
-function login(formRef) {
-  formRef.validate(async (valid) => {
-    if (valid) {
-      try {
-        let res = await proxy.$api.verifyCaptcha(user); // 验证码校验
-        if (res) {
-          api.login(user).then(async (res) => {
-            store.commit("saveUserInfo", res);
-            router.push("/welcome");
-          });
-        } else {
-          await refreshCaptcha();
-          user.captcha = "";
-        }
-      } catch (error) {
-        await refreshCaptcha();
-        user.captcha = "";
-      }
-    } else {
-      return false;
+async function login(formRef) {
+  if (!formRef || loggingIn.value) return;
+  const params = { ...user };
+  loggingIn.value = true;
+  try {
+    const valid = await formRef.validate().catch(() => false);
+    if (!valid) return;
+
+    const verified = await proxy.$api.verifyCaptcha(params); // 验证码校验
+    if (!verified) {
+      user.captcha = "";
+      await refreshCaptcha().catch(() => {});
+      return;
     }
-  });
+
+    const res = await api.login(params);
+    store.commit("saveUserInfo", res);
+    await router.push("/welcome");
+  } catch (error) {
+    user.captcha = "";
+    // 刷新失败也要恢复提交状态，允许重新获取验证码后重试。
+    await refreshCaptcha().catch(() => {});
+  } finally {
+    loggingIn.value = false;
+  }
 }
 function goHome() {
   router.push("/welcome");

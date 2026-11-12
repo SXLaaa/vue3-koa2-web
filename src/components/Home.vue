@@ -1,3 +1,4 @@
+<!-- @Description: 后台布局与导航；新增独立图片OCR入口，保留现有菜单加载逻辑。 -->
 <template>
   <div class="Layout">
     <div :class="['Layout-side', isCollapse ? 'fold' : 'unfold']">
@@ -16,6 +17,9 @@
         unique-opened
       >
         <TreeMenu :MenuList="menuList" />
+        <el-menu-item index="/other-function/photo-ocr">
+          <template #title>图片导入OCR</template>
+        </el-menu-item>
       </el-menu>
     </div>
     <div :class="['Layout-right', isCollapse ? 'fold' : 'unfold']">
