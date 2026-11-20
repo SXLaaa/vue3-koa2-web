@@ -1,102 +1,120 @@
+<!-- @Description: JS、TS及React JSX练习环境，预览独立运行，CDN仅用于React模式。 -->
 <template>
   <div class="code-lab">
-    <div class="panel editor-panel">
-      <div class="panel-header">
-        <h2>代码练习台</h2>
-        <div class="actions">
-          <div class="lang-switch">
-            <button
-              class="switch-btn"
-              :class="{ active: language === 'ts' }"
-              @click="switchLanguage('ts')"
-            >
-              TypeScript
-            </button>
-            <button
-              class="switch-btn"
-              :class="{ active: language === 'js' }"
-              @click="switchLanguage('js')"
-            >
-              JavaScript
-            </button>
-          </div>
+    <header class="workspace-header">
+      <h2>代码练习台</h2>
+      <div class="workspace-actions">
+        <CodeLabCases
+          ref="caseLibrary"
+          :language="language"
+          :draft="playground[language]"
+          :current-case="activeCases[language]"
+          :has-unsaved-code="hasUnsavedCode"
+          @saved="handleCaseSaved"
+          @opened="handleCaseOpened"
+          @removed="handleCaseRemoved"
+        />
+        <div class="run-actions">
           <el-button size="small" @click="resetCode">重置示例</el-button>
           <el-button type="primary" size="small" @click="runCode">
             运行 (Ctrl+Enter)
           </el-button>
         </div>
       </div>
+    </header>
 
-      <div class="editor-tabs">
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'html' }"
-          @click="activeTab = 'html'"
-        >
-          HTML
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'css' }"
-          @click="activeTab = 'css'"
-        >
-          CSS
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'script' }"
-          @click="activeTab = 'script'"
-        >
-          {{ language === "ts" ? "TypeScript" : "JavaScript" }}
-        </button>
+    <div class="panel editor-panel">
+      <div class="panel-header">
+        <h3>代码编辑</h3>
+        <div class="lang-switch">
+          <button
+            class="switch-btn"
+            :class="{ active: language === 'ts' }"
+            @click="switchLanguage('ts')"
+          >
+            TypeScript
+          </button>
+          <button
+            class="switch-btn"
+            :class="{ active: language === 'js' }"
+            @click="switchLanguage('js')"
+          >
+            JavaScript
+          </button>
+          <button class="switch-btn" :class="{ active: language === 'react' }" @click="switchLanguage('react')">React JSX</button>
+        </div>
       </div>
 
-      <textarea
-        v-if="activeTab === 'html'"
-        v-model="playground[language].html"
+      <div class="editor-toolbar">
+        <div class="editor-tabs">
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'html' }"
+            @click="activeTab = 'html'"
+          >
+            HTML
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'css' }"
+            @click="activeTab = 'css'"
+          >
+            CSS
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'script' }"
+            @click="activeTab = 'script'"
+          >
+            {{ language === "react" ? "React JSX" : language === "ts" ? "TypeScript" : "JavaScript" }}
+          </button>
+        </div>
+        <div class="format-toolbar">
+          <el-button size="small" @click="formatActiveCode(true)">格式化</el-button>
+          <label title="离开编辑区时格式化当前代码">
+            <input v-model="autoFormat" type="checkbox" />
+            自动格式化
+          </label>
+        </div>
+      </div>
+
+      <CodeLabEditor
+        :key="language + '/' + activeTab + '/' + editorRevision"
+        v-model="playground[language][activeTab]"
+        :mode="activeTab === 'script' ? language : activeTab"
         class="code-editor"
-        spellcheck="false"
-        @keydown.ctrl.enter.prevent="runCode"
-        @keydown.meta.enter.prevent="runCode"
+        @run="runCode"
+        @save="$refs.caseLibrary.saveCurrent()"
+        @blur="autoFormat && formatActiveCode()"
       />
-      <textarea
-        v-else-if="activeTab === 'css'"
-        v-model="playground[language].css"
-        class="code-editor"
-        spellcheck="false"
-        @keydown.ctrl.enter.prevent="runCode"
-        @keydown.meta.enter.prevent="runCode"
-      />
-      <textarea
-        v-else
-        v-model="playground[language].script"
-        class="code-editor"
-        spellcheck="false"
-        @keydown.ctrl.enter.prevent="runCode"
-        @keydown.meta.enter.prevent="runCode"
-      />
+      <div class="editor-shortcuts">
+        <div id="code-editor-shortcuts">
+          Tab 补全或缩进 · Ctrl + Space 打开提示 · Shift + Tab 取消缩进 · Esc 后按 Tab 切换焦点
+        </div>
+        <div v-if="formatError" class="format-error" role="status">{{ formatError }}</div>
+      </div>
 
       <div class="compile-result" :class="{ error: diagnostics.length }">
         <template v-if="diagnostics.length">
           <div v-for="(item, index) in diagnostics" :key="index">{{ item }}</div>
         </template>
         <template v-else>
-          {{ language === "ts" ? "TypeScript 编译成功。" : "JavaScript 无需编译。" }}
+          {{ language === "react" ? "React 19 · JSX本地编译，运行需连接CDN；可使用react和react-dom/client导入。" : language === "ts" ? "TypeScript 编译成功。" : "JavaScript 无需编译。" }}
         </template>
       </div>
     </div>
 
     <div class="panel preview-panel">
       <div class="panel-header">
-        <h2>运行效果</h2>
-        <div class="actions">
-          <span class="run-time" v-if="runAt">最近运行: {{ runAt }}</span>
-          <el-button size="small" @click="clearConsole">清空日志</el-button>
-        </div>
+        <h3>运行效果</h3>
+        <span class="run-time" v-if="runAt">最近运行: {{ runAt }}</span>
       </div>
       <iframe ref="previewFrame" title="code-preview" class="preview-frame" />
       <div class="console-box">
-        <div class="console-title">Console</div>
+        <div class="console-header">
+          <div class="console-title">Console</div>
+          <el-button size="small" class="console-clear" @click="clearConsole">清空日志</el-button>
+        </div>
         <div v-if="consoleLogs.length === 0" class="console-empty">暂无日志输出</div>
         <div v-else class="console-list">
           <div
@@ -114,11 +132,16 @@
 </template>
 
 <script>
+import CodeLabEditor from "@/components/CodeLabEditor.vue";
+import CodeLabCases from "@/components/CodeLabCases.vue";
+import { formatCodeLabSource } from "@/utils/codeLabFormatter";
+import { REACT_PRESET, REACT_IMPORT_MAP } from "@/utils/codeLabReact";
 import * as tsModule from "typescript";
 
 const tsCompiler = tsModule && tsModule.default ? tsModule.default : tsModule;
 
 const PRESETS = {
+  react: REACT_PRESET,
   ts: {
     html: `<main class="card">
   <h3>TypeScript 练习</h3>
@@ -210,13 +233,19 @@ function clonePreset(value) {
 
 export default {
   name: "CodeLab",
+  components: { CodeLabEditor, CodeLabCases },
   data() {
     return {
       language: "ts",
       activeTab: "script",
+      editorRevision: 0,
+      activeCases: { ts: null, js: null, react: null },
+      autoFormat: false,
+      formatError: "",
       playground: {
         ts: clonePreset(PRESETS.ts),
         js: clonePreset(PRESETS.js),
+        react: clonePreset(PRESETS.react),
       },
       diagnostics: [],
       consoleLogs: [],
@@ -229,12 +258,17 @@ export default {
     playground: {
       deep: true,
       handler() {
+        this.formatError = "";
         this.scheduleRun();
       },
     },
     language() {
       this.diagnostics = [];
+      this.formatError = "";
       this.scheduleRun();
+    },
+    activeTab() {
+      this.formatError = "";
     },
   },
   mounted() {
@@ -249,6 +283,47 @@ export default {
     }
   },
   methods: {
+    hasUnsavedCode(language) {
+      const draft = this.playground[language];
+      const saved = this.activeCases[language]?.draft || PRESETS[language];
+      return ["html", "css", "script"].some((tab) => draft[tab] !== saved[tab]);
+    },
+    handleCaseSaved({ id, title, language }, draft) {
+      this.activeCases[language] = { id, title, draft };
+    },
+    handleCaseOpened(item) {
+      const { language, html, css, script } = item;
+      const draft = { html, css, script };
+      this.playground[language] = { ...draft };
+      this.handleCaseSaved(item, draft);
+      this.language = language;
+      this.activeTab = "script";
+      this.editorRevision += 1;
+      this.consoleLogs = [];
+    },
+    handleCaseRemoved({ id, language }) {
+      if (this.activeCases[language]?.id === id) this.activeCases[language] = null;
+    },
+    async formatActiveCode(showError = false) {
+      const language = this.language;
+      const tab = this.activeTab;
+      const mode = tab === "script" ? language : tab;
+      const draft = this.playground[language];
+      const source = draft[tab];
+      if (!source.trim()) return;
+      this.formatError = "";
+      try {
+        const formatted = await formatCodeLabSource(source, mode, tsCompiler);
+        // 只应用到发起格式化的代码，避免异步结果覆盖后续输入。
+        if (this.playground[language] === draft && draft[tab] === source) {
+          draft[tab] = formatted;
+        }
+      } catch (error) {
+        if (showError && this.language === language && this.activeTab === tab && this.playground[language][tab] === source) {
+          this.formatError = error.message || "格式化失败，请检查代码语法。";
+        }
+      }
+    },
     switchLanguage(nextLanguage) {
       if (nextLanguage === this.language) {
         return;
@@ -265,12 +340,15 @@ export default {
       try {
         const current = this.playground[this.language];
         let outputJsCode = current.script;
-        if (this.language === "ts") {
+        if (this.language === "ts" || this.language === "react") {
           const transpileResult = tsCompiler.transpileModule(current.script, {
+            fileName: this.language === "react" ? "practice.jsx" : "practice.ts",
             compilerOptions: {
               target: tsCompiler.ScriptTarget.ES2020,
               module: tsCompiler.ModuleKind.ES2020,
               strict: true,
+              allowJs: this.language === "react",
+              jsx: tsCompiler.JsxEmit.ReactJSX,
             },
             reportDiagnostics: true,
           });
@@ -304,6 +382,7 @@ export default {
 <html>
   <head>
     <meta charset="UTF-8" />
+    ${this.language === "react" ? `<script type="importmap">${JSON.stringify(REACT_IMPORT_MAP)}${"</scr" + "ipt>"}` : ""}
     <style>
 ${cssCode}
     </style>
@@ -359,7 +438,7 @@ ${jsCode}
     },
     handlePreviewMessage(event) {
       const data = event.data || {};
-      if (data.source !== "code-lab") {
+      if (event.source !== this.$refs.previewFrame?.contentWindow || data.source !== "code-lab") {
         return;
       }
       this.consoleLogs.push({
@@ -385,56 +464,92 @@ ${jsCode}
 
 <style lang="scss" scoped>
 .code-lab {
-  height: 100%;
   display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 14px;
-  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  min-height: 590px;
+}
+
+.workspace-header,
+.panel {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+.workspace-header,
+.panel-header,
+.editor-toolbar,
+.console-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.workspace-header {
+  grid-column: 1 / -1;
+  padding: 10px 14px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #0f172a;
+  }
+}
+
+.workspace-actions,
+.run-actions,
+.editor-tabs,
+.format-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.run-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-radius: 14px;
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
 .panel-header {
-  padding: 12px 14px;
+  min-height: 52px;
+  padding: 9px 14px;
   border-bottom: 1px solid #eef2f7;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 
-  h2 {
+  h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #0f172a;
   }
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
 }
 
 .lang-switch {
   display: flex;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
-  overflow: hidden;
-  margin-right: 4px;
+  background: #f8fafc;
 }
 
 .switch-btn {
   border: none;
-  background: #f8fafc;
+  border-radius: 6px;
+  background: transparent;
   color: #475569;
-  padding: 6px 10px;
+  padding: 6px 9px;
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.2s ease;
@@ -445,17 +560,16 @@ ${jsCode}
   }
 }
 
-.editor-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 10px 14px 0;
+.editor-toolbar {
+  padding: 8px 14px;
+  border-bottom: 1px solid #eef2f7;
 }
 
 .tab-btn {
-  border: 1px solid #dbe3ef;
-  background: #f8fafc;
+  border: 1px solid transparent;
+  background: transparent;
   color: #475569;
-  border-radius: 8px;
+  border-radius: 7px;
   font-size: 12px;
   padding: 5px 10px;
   cursor: pointer;
@@ -467,35 +581,58 @@ ${jsCode}
   }
 }
 
+.format-toolbar {
+  color: #475569;
+  font-size: 12px;
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
 .code-editor {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  min-height: 360px;
-  border: none;
-  resize: none;
-  outline: none;
-  padding: 14px;
-  font: 14px/1.6 "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  color: #1f2937;
+  min-width: 0;
+  min-height: 0;
+}
+
+.editor-shortcuts {
+  padding: 7px 14px;
   background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.format-error {
+  color: #b91c1c;
 }
 
 .compile-result {
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-top: 1px solid #eef2f7;
   background: #f0fdf4;
   color: #166534;
   font-size: 13px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 
   &.error {
+    max-height: 120px;
+    overflow: auto;
     background: #fef2f2;
     color: #b91c1c;
   }
 }
 
 .preview-frame {
+  flex: 1;
   width: 100%;
-  height: 320px;
+  min-height: 0;
   border: none;
   background: #ffffff;
 }
@@ -506,42 +643,67 @@ ${jsCode}
 }
 
 .console-box {
-  border-top: 1px solid #eef2f7;
-  padding: 10px 12px;
-  min-height: 170px;
-  max-height: 260px;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 clamp(132px, 23%, 228px);
+  min-height: 0;
+  padding: 0 12px;
   background: #0b1220;
   color: #e2e8f0;
 }
 
+.console-header {
+  padding: 8px 0;
+  border-bottom: 1px solid #243042;
+}
+
 .console-title {
   font-size: 12px;
-  letter-spacing: 0.8px;
-  opacity: 0.7;
-  margin-bottom: 8px;
+  letter-spacing: 0.4px;
+  color: #cbd5e1;
+}
+
+.console-clear {
+  height: auto;
+  padding: 4px 8px;
+  background: transparent;
+  border-color: #334155;
+  color: #e2e8f0;
+
+  &:hover,
+  &:focus-visible {
+    background: #1e293b;
+    border-color: #64748b;
+    color: #ffffff;
+  }
+}
+
+.console-empty,
+.console-list {
+  padding: 9px 0;
+  font-size: 13px;
 }
 
 .console-empty {
-  font-size: 13px;
-  opacity: 0.8;
+  color: #94a3b8;
 }
 
 .console-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 0;
+  overflow: auto;
 }
 
 .console-line {
-  font-size: 13px;
-  line-height: 1.5;
   display: flex;
   gap: 8px;
-  word-break: break-word;
+  line-height: 1.5;
 }
 
 .tag {
+  flex-shrink: 0;
   font-size: 11px;
   color: #22d3ee;
   background: rgba(34, 211, 238, 0.15);
@@ -552,28 +714,30 @@ ${jsCode}
 }
 
 .text {
+  min-width: 0;
   color: #cbd5e1;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 1200px) {
-  .panel-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-}
-
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .code-lab {
-    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
   }
 
   .code-editor {
-    min-height: 280px;
+    flex: 0 0 clamp(260px, 48vh, 440px);
   }
 
   .preview-frame {
-    height: 280px;
+    flex: 0 0 clamp(240px, 42vh, 400px);
+  }
+
+  .console-box {
+    flex-basis: 132px;
   }
 }
 </style>

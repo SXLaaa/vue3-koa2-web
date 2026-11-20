@@ -1,4 +1,4 @@
-<!-- @Description: 后台布局与导航；新增独立图片OCR入口，保留现有菜单加载逻辑。 -->
+<!-- @Description: 后台布局与导航，在有权访问的学习工具分组显示图片OCR。代码练习台默认收起侧栏。 -->
 <template>
   <div class="Layout">
     <div :class="['Layout-side', isCollapse ? 'fold' : 'unfold']">
@@ -16,10 +16,7 @@
         class="nav-menu"
         unique-opened
       >
-        <TreeMenu :MenuList="menuList" />
-        <el-menu-item index="/other-function/photo-ocr">
-          <template #title>图片导入OCR</template>
-        </el-menu-item>
+        <TreeMenu :MenuList="sidebarMenus" />
       </el-menu>
     </div>
     <div :class="['Layout-right', isCollapse ? 'fold' : 'unfold']">
@@ -122,12 +119,20 @@ import TreeMenu from "./TreeMenu.vue";
 import BreadCrumb from "./BreadCrumb.vue";
 import logPicture from "./logPicture.vue";
 
+const photoOcrMenu = {
+  path: "/other-function/photo-ocr",
+  menuType: 1,
+  menuName: "图片导入OCR",
+  icon: "Picture",
+};
+
 export default {
   name: "Home",
   components: { TreeMenu, BreadCrumb, logPicture },
   data() {
     return {
-      isCollapse: false,
+      sidebarCollapsed: false,
+      codeLabSidebarCollapsed: true,
       userInfo: this.$store.state.userInfo,
       noticeCount: 0,
       menuList: [],
@@ -155,6 +160,32 @@ export default {
       showPassword: true,
     };
   },
+  computed: {
+    isCodeLab() {
+      return this.$route.name === "CodeLab";
+    },
+    isCollapse() {
+      return this.isCodeLab ? this.codeLabSidebarCollapsed : this.sidebarCollapsed;
+    },
+    sidebarMenus() {
+      const learningTools = this.menuList.find((menu) => menu.path === "/other-function");
+      if (!learningTools) return this.menuList;
+
+      const children = learningTools.children || [];
+      const configuredOcr = this.menuList.find((menu) => menu.path === photoOcrMenu.path);
+      const alreadyGrouped = children.some((menu) => menu.path === photoOcrMenu.path);
+      return this.menuList
+        .filter((menu) => menu.path !== photoOcrMenu.path)
+        .map((menu) => menu === learningTools && !alreadyGrouped
+          ? { ...menu, children: [...children, configuredOcr || photoOcrMenu] }
+          : menu);
+    },
+  },
+  watch: {
+    isCodeLab(isCodeLab) {
+      if (isCodeLab) this.codeLabSidebarCollapsed = true;
+    },
+  },
   mounted() {
     this.getNoticeCount();
     this.getMenuList();
@@ -176,7 +207,11 @@ export default {
       this.showModal = false;
     },
     toggle() {
-      this.isCollapse = !this.isCollapse;
+      if (this.isCodeLab) {
+        this.codeLabSidebarCollapsed = !this.codeLabSidebarCollapsed;
+      } else {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+      }
     },
     handleLogout(key) {
       if (key == "email") return;
