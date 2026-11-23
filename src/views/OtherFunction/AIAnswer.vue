@@ -296,10 +296,7 @@ export default {
   min-height: 0;
   padding: 28px;
   overflow: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.2), transparent 30%),
-    radial-gradient(circle at right center, rgba(245, 158, 11, 0.16), transparent 24%),
-    linear-gradient(135deg, #eef6f4 0%, #f8fbfa 48%, #f3efe7 100%);
+  background: var(--app-chat-background, var(--app-canvas));
 }
 
 .deepseek-shell {
@@ -316,10 +313,10 @@ export default {
 .chat-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--app-edge);
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
   backdrop-filter: blur(16px);
 }
 
@@ -330,23 +327,21 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   gap: 28px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 249, 247, 0.94)),
-    linear-gradient(135deg, #fef7ed, #ecfeff);
+  background: var(--app-chat-hero, var(--app-surface));
 }
 
 .hero-copy h1 {
   margin: 14px 0 12px;
   font-size: 34px;
   line-height: 1.15;
-  color: #132238;
+  color: var(--app-heading);
 }
 
 .hero-copy p {
   margin: 0;
   font-size: 15px;
   line-height: 1.8;
-  color: #48606f;
+  color: var(--app-secondary);
 }
 
 .hero-badge {
@@ -354,8 +349,8 @@ export default {
   align-items: center;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.1);
-  color: #0f766e;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -370,37 +365,37 @@ export default {
 .metric-card {
   padding: 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: var(--app-surface-raised);
+  border: 1px solid var(--app-divider);
 }
 
 .metric-label {
   display: block;
   margin-bottom: 8px;
   font-size: 12px;
-  color: #6b7a89;
+  color: var(--app-muted);
 }
 
 .metric-value {
   font-size: 20px;
-  color: #132238;
+  color: var(--app-heading);
 }
 
 .metric-value.connected {
-  color: #0f766e;
+  color: var(--app-success);
 }
 
 .metric-value.connecting {
-  color: #b45309;
+  color: var(--app-warning);
 }
 
 .metric-value.disconnected,
 .metric-value.error {
-  color: #b42318;
+  color: var(--app-error);
 }
 
 .metric-value.neutral {
-  color: #132238;
+  color: var(--app-heading);
 }
 
 .chat-card {
@@ -416,18 +411,18 @@ export default {
   justify-content: space-between;
   gap: 16px;
   padding: 26px 28px 18px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid var(--app-divider);
 }
 
 .chat-header h2 {
   margin: 0 0 6px;
   font-size: 26px;
-  color: #132238;
+  color: var(--app-heading);
 }
 
 .chat-header p {
   margin: 0;
-  color: #607180;
+  color: var(--app-muted);
   font-size: 14px;
 }
 
@@ -440,19 +435,19 @@ export default {
 }
 
 .status-pill.connected {
-  background: rgba(16, 185, 129, 0.12);
-  color: #047857;
+  background: var(--app-success-soft);
+  color: var(--app-success);
 }
 
 .status-pill.connecting {
-  background: rgba(245, 158, 11, 0.14);
-  color: #b45309;
+  background: var(--app-warning-soft);
+  color: var(--app-warning);
 }
 
 .status-pill.disconnected,
 .status-pill.error {
-  background: rgba(239, 68, 68, 0.12);
-  color: #b42318;
+  background: var(--app-error-soft);
+  color: var(--app-error);
 }
 
 .chat-messages {
@@ -460,15 +455,7 @@ export default {
   min-height: 0;
   padding: 22px 28px;
   overflow-y: auto;
-  background:
-    linear-gradient(180deg, rgba(247, 250, 252, 0.8), rgba(255, 255, 255, 0.95)),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 35px,
-      rgba(15, 23, 42, 0.018) 35px,
-      rgba(15, 23, 42, 0.018) 36px
-    );
+  background: var(--app-chat-feed, linear-gradient(180deg, var(--app-subtle), var(--app-surface)));
 }
 
 .empty-state {
@@ -499,13 +486,13 @@ export default {
 .empty-state h3 {
   margin: 18px 0 10px;
   font-size: 24px;
-  color: #132238;
+  color: var(--app-heading);
 }
 
 .empty-state p {
   max-width: 520px;
   margin: 0;
-  color: #607180;
+  color: var(--app-muted);
   line-height: 1.8;
 }
 
@@ -519,18 +506,18 @@ export default {
 
 .suggestion-chip {
   padding: 10px 16px;
-  border: 1px solid rgba(15, 118, 110, 0.16);
+  border: 1px solid var(--app-control-edge);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  color: #0f4c5c;
+  background: var(--app-surface);
+  color: var(--app-accent);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .suggestion-chip:hover {
   transform: translateY(-1px);
-  background: #fff7ed;
-  border-color: rgba(245, 158, 11, 0.28);
+  background: var(--app-warning-soft);
+  border-color: var(--app-warning);
 }
 
 .message-row {
@@ -568,13 +555,13 @@ export default {
   max-width: min(78%, 820px);
   padding: 16px 18px;
   border-radius: 22px;
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  background: var(--app-surface-raised);
+  border: 1px solid var(--app-divider);
+  box-shadow: var(--app-shadow);
 }
 
 .message-row.is-user .message-bubble {
-  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  background: linear-gradient(135deg, var(--app-warning-soft), var(--app-subtle));
 }
 
 .message-meta {
@@ -584,14 +571,14 @@ export default {
   gap: 14px;
   margin-bottom: 8px;
   font-size: 12px;
-  color: #7b8a97;
+  color: var(--app-muted);
 }
 
 .message-bubble p {
   margin: 0;
   font-size: 15px;
   line-height: 1.8;
-  color: #1f3347;
+  color: var(--app-text);
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -611,7 +598,7 @@ export default {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #0f766e;
+  background: var(--app-accent);
   animation: pulse 1.2s infinite ease-in-out;
 }
 
@@ -628,16 +615,16 @@ export default {
   grid-template-columns: minmax(0, 1fr) 148px;
   gap: 16px;
   padding: 20px 28px 28px;
-  border-top: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.9);
+  border-top: 1px solid var(--app-divider);
+  background: var(--app-surface);
 }
 
 .editor-frame {
   padding: 14px 16px 12px;
   border-radius: 24px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, #ffffff, #f8fafc);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--app-edge);
+  background: linear-gradient(180deg, var(--app-surface), var(--app-subtle));
+  box-shadow: inset 0 1px 0 var(--app-divider);
 }
 
 .editor-toolbar {
@@ -647,16 +634,16 @@ export default {
   gap: 12px;
   margin-bottom: 10px;
   font-size: 12px;
-  color: #607180;
+  color: var(--app-muted);
 }
 
 .editor-toolbar select {
   min-width: 196px;
-  border: 1px solid rgba(15, 23, 42, 0.14);
+  border: 1px solid var(--app-control-edge);
   border-radius: 12px;
   padding: 6px 10px;
-  background: #fff;
-  color: #1f3347;
+  background: var(--app-surface);
+  color: var(--app-text);
   outline: none;
 }
 
@@ -673,11 +660,11 @@ export default {
   background: transparent;
   font-size: 15px;
   line-height: 1.7;
-  color: #1f3347;
+  color: var(--app-text);
 }
 
 .editor-frame textarea::placeholder {
-  color: #96a3af;
+  color: var(--app-muted);
 }
 
 .editor-bar {
@@ -687,7 +674,7 @@ export default {
   gap: 12px;
   margin-top: 8px;
   font-size: 12px;
-  color: #7b8a97;
+  color: var(--app-muted);
 }
 
 .send-button {

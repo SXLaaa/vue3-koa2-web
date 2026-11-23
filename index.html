@@ -11,6 +11,19 @@
 
 <head>
   <meta charset="UTF-8" />
+  <script>
+    // 在页面首次绘制前恢复配色，避免夜间模式等待应用加载时闪白。
+    (function () {
+      var themeMode = "day";
+      try {
+        themeMode = window.localStorage.getItem("koa-app-theme") === "night" ? "night" : "day";
+      } catch {
+        // 本地存储不可用时保持默认日间配色。
+      }
+      document.documentElement.dataset.appTheme = themeMode;
+      document.documentElement.style.colorScheme = themeMode === "night" ? "dark" : "light";
+    })();
+  </script>
   <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48 64x64" href="/favicon.ico?v=pyramid-1" />
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg?v=pyramid-1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />

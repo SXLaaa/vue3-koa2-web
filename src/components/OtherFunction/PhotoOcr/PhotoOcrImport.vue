@@ -50,16 +50,16 @@ function selectFiles(event) { addFiles(event.target.files); event.target.value =
 function dropFiles(event) { if (!running.value) addFiles(event.dataTransfer.files); }
 </script>
 <style scoped>
-.photo-ocr { padding: 24px; color: #263449; }
+.photo-ocr { padding: 24px; color: var(--app-text); }
 .photo-ocr h2 { margin-top: 0; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
-.empty { padding: 70px 20px; text-align: center; border: 2px dashed #bdcbdc; border-radius: 10px; }
-.photo-card { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; padding: 20px; margin-top: 20px; border: 1px solid #dce4ee; border-radius: 10px; }
-.preview img { width: 100%; height: 220px; object-fit: contain; background: #f3f6fa; }
+.empty { padding: 70px 20px; text-align: center; border: 2px dashed var(--app-control-edge); border-radius: 10px; }
+.photo-card { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; padding: 20px; margin-top: 20px; border: 1px solid var(--app-edge); background: var(--app-surface); border-radius: 10px; }
+.preview img { width: 100%; height: 220px; object-fit: contain; background: var(--app-subtle); }
 .preview strong { display: block; overflow-wrap: anywhere; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .fields label { line-height: 2; }
-.warning { color: #9d4b0b; overflow-wrap: anywhere; }
-.source { color: #65758a; font-size: 13px; }
+.warning { color: var(--app-warning); overflow-wrap: anywhere; }
+.source { color: var(--app-muted); font-size: 13px; }
 @media (max-width: 760px) { .photo-card, .fields { grid-template-columns: 1fr; } .photo-ocr { padding: 12px; } }
 </style>

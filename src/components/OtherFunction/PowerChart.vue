@@ -529,8 +529,8 @@ export default {
 <style scoped>
 .power-chart-container {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #0a1931;
-  color: #e6f7ff;
+  background-color: var(--app-canvas);
+  color: var(--app-text);
   padding: 20px;
   min-height: 100vh;
 }
@@ -564,7 +564,7 @@ export default {
 }
 
 .legend-container {
-  background-color: #0d1b3e;
+  background-color: var(--app-surface);
   border-radius: 12px;
   padding: 20px;
   width: 300px;
@@ -582,14 +582,14 @@ export default {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--app-subtle);
   border-radius: 8px;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .legend-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--app-selected);
   transform: translateX(5px);
 }
 
@@ -607,40 +607,40 @@ export default {
 .legend-name {
   font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--app-heading);
 }
 
 .legend-time {
   font-size: 12px;
-  color: #a0c8ff;
+  color: var(--app-muted);
   margin-top: 2px;
 }
 
 .legend-value {
   font-size: 20px;
   font-weight: 700;
-  color: #5dafff;
+  color: var(--app-accent);
 }
 
 .stat-item {
-  background: rgba(22, 93, 255, 0.15);
+  background: var(--app-accent-soft);
   border-radius: 10px;
   padding: 15px 25px;
   min-width: 200px;
   text-align: center;
-  border: 1px solid rgba(22, 93, 255, 0.3);
+  border: 1px solid var(--app-edge);
 }
 
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #5dafff;
+  color: var(--app-accent);
   margin-bottom: 5px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #a0c8ff;
+  color: var(--app-muted);
 }
 
 @media (max-width: 1200px) {

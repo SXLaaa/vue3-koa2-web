@@ -1,0 +1,101 @@
+/* 日间模式的项目配色，默认应用于登录页、后台和通用控件。 */
+:root {
+  color-scheme: light;
+  --app-canvas: #f3f6fa;
+  --app-surface: #ffffff;
+  --app-surface-raised: #ffffff;
+  --app-subtle: #f8fafc;
+  --app-muted-surface: #eef0f3;
+  --app-heading: #14263d;
+  --app-text: #263449;
+  --app-muted: #526475;
+  --app-secondary: #64748b;
+  --app-edge: #e5e7eb;
+  --app-divider: #ece8e8;
+  --app-control-edge: #dcdfe6;
+  --app-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+  --app-tooltip-surface: #263449;
+  --app-tooltip-text: #f8fafc;
+  --app-loading-mask: rgba(255, 255, 255, 0.9);
+  --app-accent: #0f766e;
+  --app-accent-soft: #e4f2ef;
+  --app-focus: #2563eb;
+  --app-selected: #ecf5ff;
+  --app-success: #166534;
+  --app-success-soft: #edf9f0;
+  --app-warning: #9a4c0d;
+  --app-warning-soft: #fff7ed;
+  --app-error: #b91c1c;
+  --app-error-soft: #fef2f2;
+  --app-login-canvas: #f9fcff;
+  --app-login-shadow: 0 0 10px 3px rgba(48, 49, 49, 0.3);
+  --app-shell-sidebar: linear-gradient(180deg, #0c1626 0%, #14253d 52%, #10243b 100%);
+  --app-shell-top: rgba(255, 255, 255, 0.78);
+  --app-shell-control: linear-gradient(135deg, #f8fafc, #ecfeff);
+  --app-shell-notice: linear-gradient(135deg, #f8fafc, #fff7ed);
+  --app-shell-user: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 158, 11, 0.08));
+  --app-shell-edge: rgba(15, 23, 42, 0.08);
+  --app-shell-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  --app-chat-background: radial-gradient(circle at top left, rgba(15, 118, 110, 0.2), transparent 30%),
+    radial-gradient(circle at right center, rgba(245, 158, 11, 0.16), transparent 24%),
+    linear-gradient(135deg, #eef6f4 0%, #f8fbfa 48%, #f3efe7 100%);
+  --app-chat-hero: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 249, 247, 0.94)),
+    linear-gradient(135deg, #fef7ed, #ecfeff);
+
+  --app-chat-feed: linear-gradient(180deg, rgba(247, 250, 252, 0.8), rgba(255, 255, 255, 0.95)),
+    repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(15, 23, 42, 0.018) 35px, rgba(15, 23, 42, 0.018) 36px);
+
+  --code-lab-workspace: #f3f6fa;
+  --code-lab-panel: #ffffff;
+  --code-lab-subtle: #f8fafc;
+  --code-lab-edge: #e5e7eb;
+  --code-lab-divider: #eef2f7;
+  --code-lab-control-edge: #dbe3ef;
+  --code-lab-shadow: rgba(15, 23, 42, 0.05);
+  --code-lab-heading: #0f172a;
+  --code-lab-ink: #1f2937;
+  --code-lab-muted: #475569;
+  --code-lab-secondary: #64748b;
+
+  --code-lab-primary: #1d4ed8;
+  --code-lab-primary-hover: #1e40af;
+  --code-lab-primary-text: #ffffff;
+  --code-lab-selected: #eff6ff;
+  --code-lab-selected-edge: #bfd3ff;
+  --code-lab-selected-text: #1d4ed8;
+  --code-lab-focus: #2563eb;
+
+  --code-lab-success: #f0fdf4;
+  --code-lab-success-text: #166534;
+  --code-lab-error: #fef2f2;
+  --code-lab-error-edge: #fecaca;
+  --code-lab-error-text: #b91c1c;
+
+  --code-lab-console: #0b1220;
+  --code-lab-console-divider: #243042;
+  --code-lab-console-edge: #334155;
+  --code-lab-console-hover: #1e293b;
+  --code-lab-console-hover-edge: #64748b;
+  --code-lab-console-text: #e2e8f0;
+  --code-lab-console-muted: #94a3b8;
+  --code-lab-log: rgba(34, 211, 238, 0.15);
+  --code-lab-log-edge: rgba(34, 211, 238, 0.3);
+  --code-lab-log-text: #22d3ee;
+
+  --code-lab-gutter: #f1f5f9;
+  --code-lab-gutter-edge: #e2e8f0;
+  --code-lab-syntax-meta: #404740;
+  --code-lab-syntax-keyword: #708;
+  --code-lab-syntax-atom: #219;
+  --code-lab-syntax-literal: #164;
+  --code-lab-syntax-string: #a11;
+  --code-lab-syntax-escape: #c30;
+  --code-lab-syntax-definition: #00f;
+  --code-lab-syntax-local: #30a;
+  --code-lab-syntax-type: #085;
+  --code-lab-syntax-class: #167;
+  --code-lab-syntax-special: #256;
+  --code-lab-syntax-property: #00c;
+  --code-lab-syntax-comment: #854510;
+  --code-lab-syntax-invalid: #b91c1c;
+}

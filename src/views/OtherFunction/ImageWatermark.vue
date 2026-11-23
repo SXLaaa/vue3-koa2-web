@@ -888,7 +888,7 @@ onBeforeUnmount(() => {
   min-height: 0;
   padding: 12px;
   overflow: hidden;
-  background: #f1f5f9;
+  background: var(--app-canvas);
 
   .section-title {
     display: flex;
@@ -897,7 +897,7 @@ onBeforeUnmount(() => {
     flex-wrap: wrap;
     flex-shrink: 0;
     gap: 8px 16px;
-    color: #303133;
+    color: var(--app-heading);
 
     h2 {
       margin: 0;
@@ -969,7 +969,7 @@ onBeforeUnmount(() => {
     font-size: 13px;
     font-weight: 600;
     line-height: 20px;
-    color: #303133;
+    color: var(--app-heading);
   }
 
   .section-heading {
@@ -981,9 +981,9 @@ onBeforeUnmount(() => {
 
   .upload-area {
     overflow: hidden;
-    border: 1px dashed #91bbf2;
+    border: 1px dashed var(--app-control-edge);
     border-radius: 6px;
-    background: #f8fbff;
+    background: var(--app-accent-soft);
 
     .upload-btn {
       display: flex;
@@ -995,7 +995,7 @@ onBeforeUnmount(() => {
       padding: 6px 10px;
       border: none;
       background: transparent;
-      color: #606266;
+      color: var(--app-text);
       font: inherit;
       font-size: 12px;
       cursor: pointer;
@@ -1010,14 +1010,14 @@ onBeforeUnmount(() => {
 
     em {
       flex-shrink: 0;
-      color: #409eff;
+      color: var(--app-accent);
       font-style: normal;
     }
     .el-upload__tip {
       padding: 0 8px 4px;
       font-size: 11px;
       line-height: 15px;
-      color: #909399;
+      color: var(--app-muted);
     }
   }
 
@@ -1025,7 +1025,7 @@ onBeforeUnmount(() => {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px 10px;
-    background: #f5f7fa;
+    background: var(--app-subtle);
     border-radius: 6px;
     padding: 10px;
 
@@ -1047,7 +1047,7 @@ onBeforeUnmount(() => {
         font-size: 12px;
         font-weight: 500;
         line-height: 16px;
-        color: #606266;
+        color: var(--app-text);
         margin-bottom: 4px;
       }
 
@@ -1057,7 +1057,7 @@ onBeforeUnmount(() => {
         justify-content: space-between;
         height: 16px;
         margin-bottom: 4px;
-        color: #606266;
+        color: var(--app-text);
         font-size: 12px;
         font-weight: 500;
         line-height: 16px;
@@ -1088,7 +1088,7 @@ onBeforeUnmount(() => {
           font-size: 12px;
           text-align: right;
           font-weight: 500;
-          color: #409eff;
+          color: var(--app-accent);
         }
       }
     }
@@ -1142,8 +1142,8 @@ onBeforeUnmount(() => {
 
   .export-section {
     margin-top: 8px;
-    background: #ffffff;
-    border: 1px solid #e5eaf1;
+    background: var(--app-surface);
+    border: 1px solid var(--app-edge);
     :deep(.el-select),
     :deep(.el-input-number) {
       width: 100%;
@@ -1156,7 +1156,7 @@ onBeforeUnmount(() => {
     font-size: 12px;
     summary {
       cursor: pointer;
-      color: #64748b;
+      color: var(--app-muted);
       line-height: 22px;
     }
     .config-row {
@@ -1173,9 +1173,9 @@ onBeforeUnmount(() => {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--app-edge);
     border-radius: 8px;
-    background: #ffffff;
+    background: var(--app-surface);
   }
 
   .preview-heading {
@@ -1188,7 +1188,7 @@ onBeforeUnmount(() => {
   }
 
   .preview-status, .export-summary {
-    color: #8492a6;
+    color: var(--app-muted);
     font-size: 12px;
     line-height: 18px;
   }
@@ -1202,7 +1202,7 @@ onBeforeUnmount(() => {
     min-height: 0;
     overflow: hidden;
     padding: 12px;
-    background: #f8fafc;
+    background: var(--app-subtle);
   }
 
   .preview-image {
@@ -1216,7 +1216,7 @@ onBeforeUnmount(() => {
 
   .preview-empty {
     padding: 12px;
-    color: #94a3b8;
+    color: var(--app-muted);
     font-size: 13px;
     text-align: center;
   }
@@ -1229,8 +1229,8 @@ onBeforeUnmount(() => {
     flex-wrap: wrap;
     gap: 8px;
     padding: 10px 64px 10px 12px;
-    border-top: 1px solid #e8edf3;
-    background: #ffffff;
+    border-top: 1px solid var(--app-divider);
+    background: var(--app-surface);
   }
 
   .download-buttons {

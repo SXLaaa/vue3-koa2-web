@@ -1,5 +1,9 @@
+<!-- @Description: 企业后台登录页面，提供验证码登录和全局主题切换。 -->
 <template>
   <div class="login-wrapper">
+    <div class="login-theme-control">
+      <ThemeSwitch />
+    </div>
     <div class="title">基于Vue3的企业后台管理系统的设计与实现</div>
     <div class="modal">
       <el-form
@@ -33,6 +37,7 @@
             />
             <div
               v-if="captchaImage"
+              class="captcha-image"
               v-html="captchaImage"
               @click="refreshCaptcha"
             ></div>
@@ -59,6 +64,7 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { onMounted, getCurrentInstance } from "vue";
 import api from "@/api";
+import ThemeSwitch from "@/components/ThemeSwitch.vue";
 const { proxy } = getCurrentInstance();
 let user = reactive({
   userName: "",
@@ -134,29 +140,53 @@ async function refreshCaptcha() {
 
 <style lang="scss">
 .login-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #f9fcff;
-  width: 100vw;
-  height: 100vh;
+  background: var(--app-login-canvas);
+  color: var(--app-text);
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 16px;
+
+  .login-theme-control {
+    position: absolute;
+    top: clamp(12px, 2vw, 24px);
+    right: clamp(12px, 2vw, 24px);
+  }
   .title {
-    font-size: 50px;
+    color: var(--app-heading);
+    font-size: clamp(24px, 5vw, 50px);
     line-height: 1.5;
     text-align: center;
     margin-bottom: 30px;
   }
   .modal {
-    width: 500px;
-    padding: 50px;
-    background-color: #fff;
+    width: min(500px, 100%);
+    padding: clamp(20px, 5vw, 50px);
+    background: var(--app-surface);
     border-radius: 4px;
-    box-shadow: 0px 0px 10px 3px #3031314d;
+    box-shadow: var(--app-login-shadow);
+
+    .captcha-image {
+      display: flex;
+      flex: 0 0 auto;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+    }
 
     .btn-login {
       width: 100%;
     }
+  }
+}
+
+@media (max-width: 600px), (max-height: 500px) {
+  .login-wrapper {
+    padding-top: 68px;
   }
 }
 </style>

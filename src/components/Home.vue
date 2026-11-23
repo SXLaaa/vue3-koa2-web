@@ -1,4 +1,4 @@
-<!-- @Description: 后台布局与导航，在有权访问的学习工具分组显示图片OCR。代码练习台默认收起侧栏。 -->
+<!-- @Description: 后台布局与导航，在有权访问的学习工具分组显示图片OCR。代码练习台默认收起侧栏，并提供全局主题切换。 -->
 <template>
   <div class="Layout">
     <div :class="['Layout-side', isCollapse ? 'fold' : 'unfold']">
@@ -32,6 +32,7 @@
           </div>
         </div>
         <div class="user-info">
+          <ThemeSwitch />
           <el-badge :is-dot="noticeCount > 0 ? true : false" class="notice">
             <div class="top-action">
               <el-icon><Bell /></el-icon>
@@ -118,6 +119,7 @@
 import TreeMenu from "./TreeMenu.vue";
 import BreadCrumb from "./BreadCrumb.vue";
 import logPicture from "./logPicture.vue";
+import ThemeSwitch from "@/components/ThemeSwitch.vue";
 
 const photoOcrMenu = {
   path: "/other-function/photo-ocr",
@@ -128,7 +130,7 @@ const photoOcrMenu = {
 
 export default {
   name: "Home",
-  components: { TreeMenu, BreadCrumb, logPicture },
+  components: { TreeMenu, BreadCrumb, logPicture, ThemeSwitch },
   data() {
     return {
       sidebarCollapsed: false,
@@ -255,11 +257,11 @@ export default {
 .Layout {
   font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
   font-size: 15px;
-  color: #263449;
+  color: var(--app-text);
   position: relative;
   height: 100vh;
   overflow: hidden;
-  background: #f3f6fa;
+  background: var(--app-canvas);
 
   &-side {
     position: fixed;
@@ -269,7 +271,7 @@ export default {
     width: 256px;
     height: 100vh;
     padding: 18px 16px;
-    background: linear-gradient(180deg, #0c1626 0%, #14253d 52%, #10243b 100%);
+    background: var(--app-shell-sidebar);
     color: #fff;
     overflow-y: auto;
     overflow-x: hidden;
@@ -347,10 +349,10 @@ export default {
       gap: 18px;
       margin: 18px 18px 0;
       padding: 16px 22px;
-      border: 1px solid rgba(15, 23, 42, 0.08);
+      border: 1px solid var(--app-shell-edge);
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+      background: var(--app-shell-top);
+      box-shadow: var(--app-shell-shadow);
       backdrop-filter: blur(14px);
 
       &-bread {
@@ -366,9 +368,9 @@ export default {
           height: 46px;
           margin-right: 14px;
           border-radius: 16px;
-          background: linear-gradient(135deg, #f8fafc, #ecfeff);
-          border: 1px solid rgba(15, 23, 42, 0.08);
-          color: #14324a;
+          background: var(--app-shell-control);
+          border: 1px solid var(--app-shell-edge);
+          color: var(--app-heading);
           font-size: 18px;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -400,9 +402,9 @@ export default {
           width: 44px;
           height: 44px;
           border-radius: 16px;
-          background: linear-gradient(135deg, #f8fafc, #fff7ed);
-          border: 1px solid rgba(15, 23, 42, 0.08);
-          color: #17324c;
+          background: var(--app-shell-notice);
+          border: 1px solid var(--app-shell-edge);
+          color: var(--app-heading);
           font-size: 18px;
           box-shadow: none;
         }
@@ -414,9 +416,9 @@ export default {
           padding: 8px 10px 8px 8px;
           border-radius: 18px;
           cursor: pointer;
-          color: #17324c;
-          background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 158, 11, 0.08));
-          border: 1px solid rgba(15, 23, 42, 0.06);
+          color: var(--app-heading);
+          background: var(--app-shell-user);
+          border: 1px solid var(--app-shell-edge);
         }
 
         .user-avatar {
@@ -517,12 +519,12 @@ export default {
 
   .Layout-right-top .el-breadcrumb__inner,
   .Layout-right-top .el-breadcrumb__inner a {
-    color: #607180;
+    color: var(--app-muted);
     font-weight: 500;
   }
 
   .Layout-right-top .el-breadcrumb__item:last-child .el-breadcrumb__inner {
-    color: #14263d;
+    color: var(--app-heading);
     font-weight: 700;
   }
 
@@ -587,6 +589,31 @@ export default {
 
       &-top {
         border-radius: 18px;
+        gap: 10px;
+
+        &-bread .menu-fold {
+          width: 40px;
+          height: 40px;
+          margin-right: 0;
+        }
+
+        .user-info {
+          gap: 8px;
+
+          .top-action {
+            width: 38px;
+            height: 38px;
+          }
+
+          .user-link {
+            gap: 8px;
+            padding: 4px 6px;
+          }
+
+          .user-name {
+            max-width: 72px;
+          }
+        }
       }
 
       &-wrapper {
@@ -595,6 +622,12 @@ export default {
         }
       }
     }
+  }
+}
+
+@media (max-width: 380px) {
+  .Layout-right-top .user-info .user-name {
+    display: none;
   }
 }
 </style>

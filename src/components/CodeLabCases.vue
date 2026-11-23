@@ -124,7 +124,12 @@ export default {
     },
     async confirm(message, title, confirmButtonText) {
       try {
-        await ElMessageBox.confirm(message, title, { confirmButtonText, cancelButtonText: "取消", type: "warning" });
+        await ElMessageBox.confirm(message, title, {
+          confirmButtonText,
+          cancelButtonText: "取消",
+          type: "warning",
+          customClass: "code-lab-case-dialog",
+        });
         return true;
       } catch {
         return false;
@@ -172,6 +177,30 @@ export default {
 <style scoped>
 :global(.code-lab-case-dialog) {
   max-width: 92vw;
+  background: var(--code-lab-panel);
+  border: 1px solid var(--code-lab-edge);
+  color: var(--code-lab-ink);
+}
+:global(.code-lab-case-dialog .el-dialog__title),
+:global(.code-lab-case-dialog .el-message-box__title) {
+  color: var(--code-lab-heading);
+}
+:global(.code-lab-case-dialog .el-dialog__body),
+:global(.code-lab-case-dialog .el-message-box__content) {
+  color: var(--code-lab-ink);
+}
+:global(.code-lab-case-dialog .el-input__inner) {
+  background: var(--code-lab-subtle);
+  border-color: var(--code-lab-control-edge);
+  color: var(--code-lab-ink);
+}
+:global(.code-lab-case-dialog .el-input__inner::placeholder),
+:global(.code-lab-case-dialog .el-dialog__close),
+:global(.code-lab-case-dialog .el-message-box__close) {
+  color: var(--code-lab-secondary);
+}
+:global(.code-lab-case-dialog .el-input__inner:focus) {
+  border-color: var(--code-lab-focus);
 }
 .case-actions, .case-row-actions {
   display: flex;
@@ -189,7 +218,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #475569;
+  color: var(--code-lab-muted);
   font-size: 12px;
 }
 
@@ -201,7 +230,7 @@ export default {
 }
 .case-status {
   padding: 16px 0;
-  color: #64748b;
+  color: var(--code-lab-secondary);
   text-align: center;
 }
 .case-list {
@@ -217,10 +246,10 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--code-lab-divider);
 }
 .case-info strong { overflow-wrap: anywhere; }
-.case-info span { color: #64748b; font-size: 12px; }
+.case-info span { color: var(--code-lab-secondary); font-size: 12px; }
 
 @media (max-width: 480px) {
   .case-list li {

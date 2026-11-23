@@ -74,16 +74,16 @@ function zoomByBound(flag) {
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
-  background: white;
+  background: var(--app-surface);
   .add {
     width: 40px;
     height: 40px;
     font-size: 26px;
-    color: black;
+    color: var(--app-text);
     text-align: center;
     line-height: 40px;
     &:hover {
-      background: rgb(66, 61, 61);
+      background: var(--app-selected);
       cursor: pointer;
     }
   }
@@ -91,11 +91,11 @@ function zoomByBound(flag) {
     width: 40px;
     height: 40px;
     font-size: 26px;
-    color: black;
+    color: var(--app-text);
     text-align: center;
     line-height: 40px;
     &:hover {
-      background: rgb(66, 61, 61);
+      background: var(--app-selected);
       cursor: pointer;
     }
   }

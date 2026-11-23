@@ -1,0 +1,299 @@
+/* 夜间模式的项目配色及现有 Element Plus 控件的深色适配。 */
+:root[data-app-theme="night"] {
+  color-scheme: dark;
+  --app-canvas: #0b1120;
+  --app-surface: #131d2e;
+  --app-surface-raised: #19263a;
+  --app-subtle: #0f1727;
+  --app-muted-surface: #24334a;
+  --app-heading: #f1f5f9;
+  --app-text: #dce6f4;
+  --app-muted: #bdcbe0;
+  --app-secondary: #a4b5cd;
+  --app-edge: #304057;
+  --app-divider: #28364c;
+  --app-control-edge: #42546e;
+  --app-shadow: 0 8px 28px rgba(3, 7, 18, 0.28);
+  --app-tooltip-surface: #24334a;
+  --app-tooltip-text: #f1f5f9;
+  --app-loading-mask: rgba(11, 17, 32, 0.82);
+  --app-accent: #8ce5d6;
+  --app-accent-soft: #183c42;
+  --app-focus: #93c5fd;
+  --app-selected: #243a56;
+  --app-success: #9ae6bd;
+  --app-success-soft: #102b27;
+  --app-warning: #ffd697;
+  --app-warning-soft: #35291f;
+  --app-error: #ffc0c8;
+  --app-error-soft: #341d2b;
+  --app-login-canvas: #0b1120;
+  --app-login-shadow: 0 12px 40px rgba(3, 7, 18, 0.38);
+  --app-shell-sidebar: linear-gradient(180deg, #0a1221 0%, #121f33 52%, #0e1a2e 100%);
+  --app-shell-top: rgba(19, 29, 46, 0.93);
+  --app-shell-control: linear-gradient(135deg, #18283e, #183241);
+  --app-shell-notice: linear-gradient(135deg, #18283e, #302923);
+  --app-shell-user: linear-gradient(135deg, #183341, #302923);
+  --app-shell-edge: #304057;
+  --app-shell-shadow: 0 2px 12px rgba(3, 7, 18, 0.2);
+  --app-chat-background: radial-gradient(circle at top left, rgba(45, 212, 191, 0.1), transparent 32%),
+    radial-gradient(circle at right center, rgba(245, 158, 11, 0.08), transparent 28%), var(--app-canvas);
+  --app-chat-hero: linear-gradient(155deg, var(--app-surface-raised), var(--app-surface));
+
+  --el-text-color-primary: var(--app-heading);
+  --el-text-color-regular: var(--app-text);
+  --el-text-color-secondary: var(--app-muted);
+  --el-text-color-placeholder: var(--app-secondary);
+  --el-border-color-base: var(--app-control-edge);
+  --el-border-color-light: var(--app-edge);
+  --el-border-color-lighter: var(--app-divider);
+  --el-border-color-extra-light: var(--app-divider);
+  --el-background-color-base: var(--app-muted-surface);
+  --el-disabled-fill-base: var(--app-muted-surface);
+  --el-disabled-border-base: var(--app-edge);
+  --el-disabled-color-base: var(--app-secondary);
+  --el-color-primary-light-8: var(--app-control-edge);
+  --el-color-primary-light-9: var(--app-selected);
+
+  --app-chat-feed: repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(148, 163, 184, 0.04) 35px, rgba(148, 163, 184, 0.04) 36px),
+    linear-gradient(180deg, var(--app-subtle), var(--app-surface));
+
+  --code-lab-workspace: #0b1120;
+  --code-lab-panel: #131d2e;
+  --code-lab-subtle: #0f1727;
+  --code-lab-edge: #304057;
+  --code-lab-divider: #28364c;
+  --code-lab-control-edge: #41536d;
+  --code-lab-shadow: rgba(3, 7, 18, 0.25);
+  --code-lab-heading: #f1f5f9;
+  --code-lab-ink: #dce6f4;
+  --code-lab-muted: #bac9dd;
+  --code-lab-secondary: #a4b5cd;
+
+  --code-lab-primary: #8ab4fb;
+  --code-lab-primary-hover: #a2c5fc;
+  --code-lab-primary-text: #102345;
+  --code-lab-selected: #21344f;
+  --code-lab-selected-edge: #5477a5;
+  --code-lab-selected-text: #d0e4ff;
+  --code-lab-focus: #93c5fd;
+
+  --code-lab-success: #102b27;
+  --code-lab-success-text: #9ae6bd;
+  --code-lab-error: #341d2b;
+  --code-lab-error-edge: #80516a;
+  --code-lab-error-text: #ffc0c8;
+
+  --code-lab-console: #090f1b;
+  --code-lab-console-divider: #273449;
+  --code-lab-console-edge: #41536d;
+  --code-lab-console-hover: #24344c;
+  --code-lab-console-hover-edge: #6d88a9;
+  --code-lab-console-text: #dce6f4;
+  --code-lab-console-muted: #a4b5cd;
+  --code-lab-log: #133146;
+  --code-lab-log-edge: #2f6479;
+  --code-lab-log-text: #92e6f4;
+
+  --code-lab-gutter: #101a2a;
+  --code-lab-gutter-edge: #2a3b53;
+  --code-lab-syntax-meta: #bdcce0;
+  --code-lab-syntax-keyword: #d1b7ff;
+  --code-lab-syntax-atom: #b8caff;
+  --code-lab-syntax-literal: #97dbce;
+  --code-lab-syntax-string: #f3b997;
+  --code-lab-syntax-escape: #f9cf80;
+  --code-lab-syntax-definition: #92c6ff;
+  --code-lab-syntax-local: #d1b7ff;
+  --code-lab-syntax-type: #8cdee8;
+  --code-lab-syntax-class: #96dfca;
+  --code-lab-syntax-special: #a1d5f8;
+  --code-lab-syntax-property: #adcfff;
+  --code-lab-syntax-comment: #9aaec8;
+  --code-lab-syntax-invalid: #ffadc1;
+}
+
+:root[data-app-theme="night"] :is(
+  .el-card,
+  .el-dialog,
+  .el-drawer,
+  .el-message-box,
+  .el-notification,
+  .el-popper.is-light,
+  .el-dropdown__popper,
+  .el-dropdown-menu,
+  .el-picker-panel,
+  .el-picker-panel__footer,
+  .el-picker-panel__sidebar,
+  .el-time-panel,
+  .el-select-dropdown,
+  .el-cascader__dropdown,
+  .el-tree,
+  .el-table,
+  .el-table tr,
+  .el-table th,
+  .el-table td.el-table__expanded-cell
+) {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--app-edge);
+}
+
+:root[data-app-theme="night"] .el-popper.is-light .el-popper__arrow::before {
+  background-color: var(--app-surface);
+  border-color: var(--app-edge);
+}
+
+/* 旧版控件的提示框和下拉菜单内层仍有固定浅色背景。 */
+:root[data-app-theme="night"] .el-popper.is-dark {
+  background-color: var(--app-tooltip-surface);
+  color: var(--app-tooltip-text);
+}
+
+:root[data-app-theme="night"] .el-popper.is-dark .el-popper__arrow::before {
+  background-color: var(--app-tooltip-surface);
+}
+
+:root[data-app-theme="night"] .el-dropdown-menu__item--divided::before {
+  background-color: var(--app-surface);
+}
+
+:root[data-app-theme="night"] .el-table {
+  --el-table-border-color: var(--app-divider);
+  --el-table-header-background-color: var(--app-surface-raised);
+  --el-table-row-hover-background-color: var(--app-selected);
+  --el-table-current-row-background-color: var(--app-selected);
+  --el-table-fixed-box-shadow: var(--app-shadow);
+}
+
+:root[data-app-theme="night"] .el-table th.el-table__cell {
+  background-color: var(--app-surface-raised);
+}
+
+:root[data-app-theme="night"] .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background-color: var(--app-subtle);
+}
+
+:root[data-app-theme="night"] :is(
+  .el-table--enable-row-hover .el-table__body tr:hover,
+  .el-table__body tr.current-row,
+  .el-table__body tr.hover-row
+) > td.el-table__cell {
+  background-color: var(--app-selected);
+}
+
+/* 优先适配控件变量，让原有聚焦、校验失败和禁用状态正常生效。 */
+:root[data-app-theme="night"] :is(.el-input, .el-textarea, .el-range-editor) {
+  --el-input-background-color: var(--app-subtle);
+  --el-input-hover-border: var(--app-secondary);
+  --el-input-focus-border: var(--app-focus);
+}
+
+:root[data-app-theme="night"] .el-checkbox {
+  --el-checkbox-background-color: var(--app-subtle);
+  --el-checkbox-disabled-input-fill: var(--app-muted-surface);
+}
+
+:root[data-app-theme="night"] .el-radio {
+  --el-radio-input-background-color: var(--app-subtle);
+}
+
+:root[data-app-theme="night"] :is(
+  .el-input-number__decrease,
+  .el-input-number__increase,
+  .el-upload-dragger
+) {
+  background-color: var(--app-subtle);
+  border-color: var(--app-control-edge);
+}
+
+:root[data-app-theme="night"] .el-form-item.is-error :is(.el-input__inner, .el-textarea__inner) {
+  border-color: var(--app-error);
+}
+
+:root[data-app-theme="night"] .el-form-item__error {
+  color: var(--app-error);
+}
+
+:root[data-app-theme="night"] .el-button:not([class*="el-button--"]),
+:root[data-app-theme="night"] .el-button.el-button--default {
+  --el-button-background-color: var(--app-surface);
+  --el-button-font-color: var(--app-text);
+  --el-button-disabled-background-color: var(--app-muted-surface);
+}
+
+:root[data-app-theme="night"] .el-button.el-button--default:not(.is-disabled):is(:hover, :focus) {
+  background-color: var(--app-selected);
+  color: var(--app-heading);
+  border-color: var(--app-focus);
+}
+
+:root[data-app-theme="night"] .el-button.el-button--default.is-disabled.is-plain {
+  background-color: var(--app-muted-surface);
+}
+
+:root[data-app-theme="night"] :is(
+  .el-select-dropdown__item:not(.is-disabled).hover,
+  .el-select-dropdown__item:not(.is-disabled):hover,
+  .el-dropdown-menu__item:not(.is-disabled):hover,
+  .el-dropdown-menu__item:not(.is-disabled):focus,
+  .el-cascader-node:not(.is-disabled):hover,
+  .el-cascader-node:not(.is-disabled):focus,
+  .el-picker-panel__shortcut:hover
+) {
+  background-color: var(--app-selected);
+  color: var(--app-heading);
+}
+
+:root[data-app-theme="night"] .el-pagination {
+  --el-pagination-background-color: var(--app-subtle);
+  --el-pagination-button-disabled-background-color: var(--app-subtle);
+  --el-pagination-hover-color: var(--app-focus);
+}
+
+:root[data-app-theme="night"] .el-pagination.is-background :is(.btn-prev, .btn-next, .el-pager li:not(.active)) {
+  background-color: var(--app-subtle);
+}
+
+:root[data-app-theme="night"] .el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: var(--app-selected);
+  color: var(--app-focus);
+}
+
+:root[data-app-theme="night"] :is(.el-date-picker, .el-date-range-picker, .el-time-panel) {
+  --el-datepicker-inner-border-color: var(--app-divider);
+}
+
+:root[data-app-theme="night"] .el-date-editor .el-range-input {
+  background-color: transparent;
+}
+
+:root[data-app-theme="night"] .el-date-table td.disabled div {
+  background-color: var(--app-muted-surface);
+}
+
+:root[data-app-theme="night"] .el-time-spinner__item:hover:not(.disabled):not(.active),
+:root[data-app-theme="night"] .el-picker-panel__shortcut.active {
+  background-color: var(--app-selected);
+}
+
+:root[data-app-theme="night"] .el-loading-mask {
+  background-color: var(--app-loading-mask);
+}
+
+:root[data-app-theme="night"] .el-message {
+  background-color: var(--app-surface-raised);
+  border-color: var(--app-edge);
+}
+:root[data-app-theme="night"] .el-message__content {
+  color: var(--app-text);
+}
+:root[data-app-theme="night"] .el-message--success .el-message__content {
+  color: var(--app-success);
+}
+:root[data-app-theme="night"] .el-message--warning .el-message__content {
+  color: var(--app-warning);
+}
+:root[data-app-theme="night"] .el-message--error .el-message__content {
+  color: var(--app-error);
+}

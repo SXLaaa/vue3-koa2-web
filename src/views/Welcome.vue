@@ -1,3 +1,4 @@
+<!-- @Description: 后台欢迎页面，使用全局主题的背景和文字配色。 -->
 <template>
   <div class="welcome">
     <div class="welcome-content">
@@ -26,8 +27,8 @@ export default {
   min-height: 100%;
   padding: 40px;
   box-sizing: border-box;
-  background: #fff;
-  border: 1px solid #e7edf3;
+  background: var(--app-surface);
+  border: 1px solid var(--app-edge);
   border-radius: 16px;
   .welcome-content-title {
     font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
@@ -35,7 +36,7 @@ export default {
     font-weight: 600;
     line-height: 1.5;
     letter-spacing: 1px;
-    color: #23364d;
+    color: var(--app-heading);
     white-space: nowrap;
   }
   .welcome-img {

@@ -921,15 +921,16 @@ export default {
 .copy-card {
   width: min(100%, 530px);
   padding: 24px;
-  border: 1px solid rgba(231, 247, 232, 0.18);
+  border: 1px solid var(--app-control-edge);
   border-radius: 28px;
-  background: rgba(6, 21, 27, 0.45);
+  background: var(--app-surface);
+  background: color-mix(in srgb, var(--app-surface) 90%, transparent);
   backdrop-filter: blur(10px);
   box-shadow: 0 24px 90px rgba(2, 10, 12, 0.36);
   transition: border-color 0.3s ease;
 
   &:hover {
-    border-color: rgba(231, 247, 232, 0.28);
+    border-color: var(--app-accent);
   }
 }
 
@@ -942,10 +943,10 @@ export default {
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    rgba(238, 247, 241, 0.18),
-    rgba(152, 211, 186, 0.09)
+    var(--app-subtle),
+    var(--app-surface-raised)
   );
-  color: #f7fff8;
+  color: var(--app-text);
   font: 600 17px/28px "Georgia", serif;
   white-space: nowrap;
   overflow: hidden;
@@ -957,10 +958,10 @@ export default {
     transform: translateX(4px);
     background: linear-gradient(
       90deg,
-      rgba(238, 247, 241, 0.26),
-      rgba(152, 211, 186, 0.16)
+      var(--app-selected),
+      var(--app-subtle)
     );
-    border-color: rgba(240, 250, 244, 0.3);
+    border-color: var(--app-accent);
   }
 
   &:last-child {
@@ -972,8 +973,8 @@ export default {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #a9e8c6;
-  box-shadow: 0 0 8px #a9e8c6;
+  background: var(--app-success);
+  box-shadow: 0 0 8px var(--app-success);
   flex-shrink: 0;
 }
 
@@ -990,26 +991,28 @@ export default {
 }
 
 .stat-item {
+  color: var(--app-text);
   min-width: 110px;
   padding: 12px 16px;
   border-radius: 18px;
-  background: rgba(244, 252, 245, 0.09);
-  border: 1px solid rgba(244, 252, 245, 0.14);
+  background: var(--app-surface);
+  background: color-mix(in srgb, var(--app-surface) 92%, transparent);
+  border: 1px solid var(--app-control-edge);
   backdrop-filter: blur(6px);
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(244, 252, 245, 0.14);
+    background: var(--app-subtle);
   }
 }
 
 .stat-wind {
   cursor: pointer;
-  border-color: rgba(169, 232, 198, 0.25);
-  background: rgba(169, 232, 198, 0.1);
+  border-color: var(--app-control-edge);
+  background: var(--app-success-soft);
 
   &:hover {
-    background: rgba(169, 232, 198, 0.18);
+    background: var(--app-selected);
     transform: translateY(-2px);
   }
 }
@@ -1018,7 +1021,7 @@ export default {
   display: block;
   margin-bottom: 6px;
   font-size: 12px;
-  color: rgba(218, 241, 222, 0.72);
+  color: var(--app-muted);
 }
 
 .stat-value {
@@ -1028,7 +1031,7 @@ export default {
 
 .wind-val {
   font-size: 16px;
-  color: #c5f4d8;
+  color: var(--app-success);
 }
 
 .interaction-tip {
@@ -1063,12 +1066,13 @@ export default {
   min-height: 44px;
   padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(10, 31, 36, 0.76);
-  border: 1px solid rgba(244, 252, 245, 0.18);
+  background: var(--app-surface-raised);
+  background: color-mix(in srgb, var(--app-surface-raised) 92%, transparent);
+  border: 1px solid var(--app-control-edge);
   box-shadow:
     0 16px 40px rgba(4, 18, 21, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  color: rgba(248, 253, 249, 0.94);
+  color: var(--app-text);
   font: 600 14px/1.4 "Georgia", serif;
   animation-name: floatSeedLabel;
   animation-timing-function: ease-in-out;
@@ -1080,7 +1084,7 @@ export default {
 
   &:hover {
     transform: scale(1.06) translateY(-4px) translateZ(0) !important;
-    border-color: rgba(185, 245, 210, 0.5);
+    border-color: var(--app-accent);
     box-shadow:
       0 20px 50px rgba(6, 26, 30, 0.45),
       0 0 20px rgba(169, 232, 198, 0.25);
@@ -1091,7 +1095,7 @@ export default {
 .seed-icon {
   width: 16px;
   height: 16px;
-  color: #bbf0d3;
+  color: var(--app-success);
   flex-shrink: 0;
 }
 

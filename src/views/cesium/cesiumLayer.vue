@@ -225,7 +225,8 @@ export default {
 
   .menu-toggle-button {
     z-index: 2; // 确保按钮在菜单之上
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--app-surface);
+    color: var(--app-heading);
     padding: 5px;
     cursor: pointer;
     border-radius: 50%;
@@ -239,7 +240,7 @@ export default {
       font-size: 20px;
     }
     &:hover {
-      background-color: rgba(108, 126, 185, 0.7);
+      background-color: var(--app-selected);
     }
     &.collapsed {
       transform: translateY(-50%) translateX(0);
@@ -273,7 +274,7 @@ export default {
     }
   }
   .container {
-    background: floralwhite;
+    background: var(--app-surface);
     position: absolute;
     width: 100%;
     height: 100%;

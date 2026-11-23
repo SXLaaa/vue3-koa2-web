@@ -5,19 +5,21 @@
 
 <script>
 import { markRaw } from "vue";
-import { EditorState, Prec } from "@codemirror/state";
+import { Compartment, EditorState, Prec } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import {
   history, historyKeymap, indentLess, indentMore, insertNewline, isolateHistory, standardKeymap, temporarilySetTabFocusMode,
 } from "@codemirror/commands";
-import { defaultHighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
+import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
 import {
   acceptCompletion, autocompletion, closeCompletion, completionKeymap, nextSnippetField, prevSnippetField,
 } from "@codemirror/autocomplete";
 import { javascript, jsxLanguage, scopeCompletionSource } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
+import { tags } from "@lezer/highlight";
 import { completeReact } from "@/utils/codeLabReactCompletion";
+import { appThemeMode } from "@/utils/appTheme";
 
 const INDENT = "  ";
 
@@ -48,12 +50,38 @@ function languageExtensions(mode) {
   ];
 }
 
+const themeModeConfig = new Compartment();
+
+const highlight = HighlightStyle.define([
+  { tag: tags.meta, color: "var(--code-lab-syntax-meta)" },
+  { tag: tags.link, textDecoration: "underline" },
+  { tag: tags.heading, textDecoration: "underline", fontWeight: "bold" },
+  { tag: tags.emphasis, fontStyle: "italic" },
+  { tag: tags.strong, fontWeight: "bold" },
+  { tag: tags.strikethrough, textDecoration: "line-through" },
+  { tag: tags.keyword, color: "var(--code-lab-syntax-keyword)" },
+  { tag: [tags.atom, tags.bool, tags.url, tags.contentSeparator, tags.labelName], color: "var(--code-lab-syntax-atom)" },
+  { tag: [tags.literal, tags.inserted], color: "var(--code-lab-syntax-literal)" },
+  { tag: [tags.string, tags.deleted], color: "var(--code-lab-syntax-string)" },
+  { tag: [tags.regexp, tags.escape, tags.special(tags.string)], color: "var(--code-lab-syntax-escape)" },
+  { tag: tags.definition(tags.variableName), color: "var(--code-lab-syntax-definition)" },
+  { tag: tags.local(tags.variableName), color: "var(--code-lab-syntax-local)" },
+  { tag: [tags.typeName, tags.namespace], color: "var(--code-lab-syntax-type)" },
+  { tag: tags.className, color: "var(--code-lab-syntax-class)" },
+  { tag: [tags.special(tags.variableName), tags.macroName], color: "var(--code-lab-syntax-special)" },
+  { tag: tags.definition(tags.propertyName), color: "var(--code-lab-syntax-property)" },
+  { tag: tags.comment, color: "var(--code-lab-syntax-comment)" },
+  { tag: tags.invalid, color: "var(--code-lab-syntax-invalid)" },
+]);
+
 const theme = EditorView.theme({
-  "&": { flex: "1", minHeight: "0", backgroundColor: "#f8fafc", color: "#1f2937", fontSize: "14px" },
-  "&.cm-focused": { outline: "1px solid #93c5fd", outlineOffset: "-1px" },
+  "&": { flex: "1", minHeight: "0", backgroundColor: "var(--code-lab-subtle)", color: "var(--code-lab-ink)", fontSize: "14px" },
+  "&.cm-focused": { outline: "1px solid var(--code-lab-focus)", outlineOffset: "-1px" },
   ".cm-scroller": { fontFamily: 'Consolas, "Liberation Mono", Menlo, monospace', lineHeight: "1.6" },
   ".cm-content": { padding: "12px 0" },
-  ".cm-gutters": { backgroundColor: "#f1f5f9", color: "#64748b", borderRight: "1px solid #e2e8f0" },
+  ".cm-gutters": { backgroundColor: "var(--code-lab-gutter)", color: "var(--code-lab-secondary)", borderRight: "1px solid var(--code-lab-gutter-edge)" },
+  ".cm-tooltip": { backgroundColor: "var(--code-lab-panel)", borderColor: "var(--code-lab-control-edge)", color: "var(--code-lab-ink)" },
+  ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "var(--code-lab-selected)", color: "var(--code-lab-selected-text)" },
 });
 
 export default {
@@ -66,7 +94,18 @@ export default {
   data() {
     return { editor: null };
   },
+  computed: {
+    themeMode() {
+      return appThemeMode.value;
+    },
+  },
   watch: {
+    themeMode(mode) {
+      // 调整夜间配置时保留现有编辑器和撤销记录。
+      this.editor?.dispatch({
+        effects: themeModeConfig.reconfigure(EditorView.darkTheme.of(mode === "night")),
+      });
+    },
     modelValue(value) {
       const editor = this.editor;
       if (!editor || editor.state.doc.toString() === value) return;
@@ -93,7 +132,8 @@ export default {
         indentUnit.of(INDENT),
         lineNumbers(),
         history(),
-        syntaxHighlighting(defaultHighlightStyle),
+        syntaxHighlighting(highlight),
+        themeModeConfig.of(EditorView.darkTheme.of(this.themeMode === "night")),
         autocompletion({ defaultKeymap: false, activateOnTypingDelay: 25, interactionDelay: 0 }),
         EditorView.contentAttributes.of({ "aria-label": "代码编辑器", "aria-describedby": "code-editor-shortcuts" }),
         EditorView.lineWrapping,

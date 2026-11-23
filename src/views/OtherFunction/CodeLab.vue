@@ -1,4 +1,4 @@
-<!-- @Description: JS、TS及React JSX练习环境，预览独立运行，CDN仅用于React模式。 -->
+<!-- @Description: JS、TS及React JSX练习环境，支持日夜配色和独立预览。 -->
 <template>
   <div class="code-lab">
     <header class="workspace-header">
@@ -470,15 +470,16 @@ ${jsCode}
   gap: 14px;
   height: 100%;
   min-height: 590px;
+  background: var(--code-lab-workspace);
 }
 
 .workspace-header,
 .panel {
   min-width: 0;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--code-lab-panel);
+  border: 1px solid var(--code-lab-edge);
   border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 6px 20px var(--code-lab-shadow);
 }
 
 .workspace-header,
@@ -499,7 +500,7 @@ ${jsCode}
   h2 {
     margin: 0;
     font-size: 18px;
-    color: #0f172a;
+    color: var(--code-lab-heading);
   }
 }
 
@@ -528,62 +529,72 @@ ${jsCode}
 .panel-header {
   min-height: 52px;
   padding: 9px 14px;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--code-lab-divider);
 
   h3 {
     margin: 0;
     font-size: 15px;
-    color: #0f172a;
+    color: var(--code-lab-heading);
   }
 }
 
 .lang-switch {
   display: flex;
-  border: 1px solid #dbe3ef;
+  border: 1px solid var(--code-lab-control-edge);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--code-lab-subtle);
 }
 
 .switch-btn {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: #475569;
+  color: var(--code-lab-muted);
   padding: 6px 9px;
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.2s ease;
 
   &.active {
-    background: #1d4ed8;
-    color: #fff;
+    background: var(--code-lab-primary);
+    color: var(--code-lab-primary-text);
   }
 }
 
 .editor-toolbar {
   padding: 8px 14px;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--code-lab-divider);
 }
 
 .tab-btn {
   border: 1px solid transparent;
   background: transparent;
-  color: #475569;
+  color: var(--code-lab-muted);
   border-radius: 7px;
   font-size: 12px;
   padding: 5px 10px;
   cursor: pointer;
 
   &.active {
-    color: #1d4ed8;
-    border-color: #bfd3ff;
-    background: #eff6ff;
+    color: var(--code-lab-selected-text);
+    border-color: var(--code-lab-selected-edge);
+    background: var(--code-lab-selected);
   }
 }
 
+.switch-btn:focus-visible,
+.tab-btn:focus-visible {
+  outline: 2px solid var(--code-lab-focus);
+  outline-offset: -2px;
+}
+
 .format-toolbar {
-  color: #475569;
+  color: var(--code-lab-muted);
   font-size: 12px;
+
+  input {
+    accent-color: var(--code-lab-primary);
+  }
 
   label {
     display: inline-flex;
@@ -602,21 +613,21 @@ ${jsCode}
 
 .editor-shortcuts {
   padding: 7px 14px;
-  background: #f8fafc;
-  color: #475569;
+  background: var(--code-lab-subtle);
+  color: var(--code-lab-muted);
   font-size: 12px;
   line-height: 1.55;
 }
 
 .format-error {
-  color: #b91c1c;
+  color: var(--code-lab-error-text);
 }
 
 .compile-result {
   padding: 8px 14px;
-  border-top: 1px solid #eef2f7;
-  background: #f0fdf4;
-  color: #166534;
+  border-top: 1px solid var(--code-lab-divider);
+  background: var(--code-lab-success);
+  color: var(--code-lab-success-text);
   font-size: 13px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -624,8 +635,8 @@ ${jsCode}
   &.error {
     max-height: 120px;
     overflow: auto;
-    background: #fef2f2;
-    color: #b91c1c;
+    background: var(--code-lab-error);
+    color: var(--code-lab-error-text);
   }
 }
 
@@ -634,11 +645,11 @@ ${jsCode}
   width: 100%;
   min-height: 0;
   border: none;
-  background: #ffffff;
+  background: var(--code-lab-panel);
 }
 
 .run-time {
-  color: #64748b;
+  color: var(--code-lab-secondary);
   font-size: 12px;
 }
 
@@ -648,33 +659,33 @@ ${jsCode}
   flex: 0 0 clamp(132px, 23%, 228px);
   min-height: 0;
   padding: 0 12px;
-  background: #0b1220;
-  color: #e2e8f0;
+  background: var(--code-lab-console);
+  color: var(--code-lab-console-text);
 }
 
 .console-header {
   padding: 8px 0;
-  border-bottom: 1px solid #243042;
+  border-bottom: 1px solid var(--code-lab-console-divider);
 }
 
 .console-title {
   font-size: 12px;
   letter-spacing: 0.4px;
-  color: #cbd5e1;
+  color: var(--code-lab-console-text);
 }
 
 .console-clear {
   height: auto;
   padding: 4px 8px;
   background: transparent;
-  border-color: #334155;
-  color: #e2e8f0;
+  border-color: var(--code-lab-console-edge);
+  color: var(--code-lab-console-text);
 
   &:hover,
   &:focus-visible {
-    background: #1e293b;
-    border-color: #64748b;
-    color: #ffffff;
+    background: var(--code-lab-console-hover);
+    border-color: var(--code-lab-console-hover-edge);
+    color: var(--code-lab-console-text);
   }
 }
 
@@ -685,7 +696,7 @@ ${jsCode}
 }
 
 .console-empty {
-  color: #94a3b8;
+  color: var(--code-lab-console-muted);
 }
 
 .console-list {
@@ -705,9 +716,9 @@ ${jsCode}
 .tag {
   flex-shrink: 0;
   font-size: 11px;
-  color: #22d3ee;
-  background: rgba(34, 211, 238, 0.15);
-  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: var(--code-lab-log-text);
+  background: var(--code-lab-log);
+  border: 1px solid var(--code-lab-log-edge);
   border-radius: 999px;
   padding: 1px 8px;
   height: fit-content;
@@ -715,7 +726,7 @@ ${jsCode}
 
 .text {
   min-width: 0;
-  color: #cbd5e1;
+  color: var(--code-lab-console-text);
   overflow-wrap: anywhere;
 }
 
@@ -738,6 +749,47 @@ ${jsCode}
 
   .console-box {
     flex-basis: 132px;
+  }
+}
+</style>
+
+<style lang="scss">
+.code-lab,
+.code-lab-case-dialog {
+  .el-button:not(.console-clear) {
+    background: var(--code-lab-panel);
+    border-color: var(--code-lab-control-edge);
+    color: var(--code-lab-ink);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--code-lab-selected);
+      border-color: var(--code-lab-selected-edge);
+      color: var(--code-lab-selected-text);
+    }
+  }
+
+  .el-button.el-button--primary {
+    background: var(--code-lab-primary);
+    border-color: var(--code-lab-primary);
+    color: var(--code-lab-primary-text);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--code-lab-primary-hover);
+      border-color: var(--code-lab-primary-hover);
+      color: var(--code-lab-primary-text);
+    }
+  }
+
+  .el-button.el-button--danger {
+    background: var(--code-lab-error);
+    border-color: var(--code-lab-error-edge);
+    color: var(--code-lab-error-text);
+  }
+
+  .el-button:disabled {
+    opacity: 0.55;
   }
 }
 </style>

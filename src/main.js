@@ -11,6 +11,9 @@ import App from "./App.vue";
 import router from "./router";
 import ElementPlus from "element-plus";
 import "element-plus/lib/theme-chalk/index.css";
+import "./assets/style/theme-day.css";
+import "./assets/style/theme-night.css";
+import { initializeAppTheme } from "./utils/appTheme";
 import request from "./utils/request";
 import api from "./api/index";
 import storage from "./utils/storage";
@@ -19,6 +22,7 @@ import keyBoard from "./utils/common";
 import * as icons from "@element-plus/icons-vue";
 // import * as Cesium from "cesium";
 // console.log("环境变量=>",import.meta.env)
+initializeAppTheme();
 const app = createApp(App);
 // 全局指令
 app.directive("has", {

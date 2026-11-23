@@ -17,6 +17,7 @@
     "@codemirror/state": "6.7.6",
     "@codemirror/view": "6.43.15",
     "@element-plus/icons-vue": "^2.0.4",
+    "@lezer/highlight": "1.2.5",
     "axios": "^1.4.0",
     "cesium": "^1.116.0",
     "echarts": "^6.0.0",

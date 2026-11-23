@@ -4,18 +4,20 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
+  background: var(--app-canvas);
+  color: var(--app-text);
 }
 *:not([class^="el-"]) {
   box-sizing: border-box;
 }
 .white {
-  background-color: #ffffff;
+  background-color: var(--app-surface);
 }
 a {
   text-decoration: none;
 }
 .gray {
-  background-color: #eef0f3;
+  background-color: var(--app-muted-surface);
 }
 .mr10 {
   margin-right: 10px;
@@ -55,27 +57,27 @@ a {
 }
 .tips {
   margin-left: 15px;
-  color: #787878;
+  color: var(--app-secondary);
 }
 
 /*
 * 公共样式
 */
 .query-form {
-  background-color: #ffffff;
+  background-color: var(--app-surface);
   padding: 22px 20px 0;
   border-radius: 5px;
 }
 .base-table {
   border-radius: 5px;
-  background: #ffffff;
+  background: var(--app-surface);
   margin-top: 20px;
   margin-bottom: 20px;
   .action {
     border-radius: 5px 5px 0px 0px;
-    background: #ffffff;
+    background: var(--app-surface);
     padding: 20px;
-    border-bottom: 1px solid #ece8e8;
+    border-bottom: 1px solid var(--app-divider);
   }
   .pagination {
     text-align: right;
